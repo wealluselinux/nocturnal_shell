@@ -1,0 +1,91 @@
+#!/bin/sh
+command -v dolphin >/dev/null 2>&1 || exit 0
+hex="${1:-#c9b8ff}"
+hex="${hex#\#}"
+r=$(printf "%d" "0x${hex%????}")
+g=$(printf "%d" "0x${hex#??}" 2>/dev/null)
+g=$(printf "%d" "0x$(printf '%s' "$hex" | cut -c3-4)")
+b=$(printf "%d" "0x$(printf '%s' "$hex" | cut -c5-6)")
+acc="$r,$g,$b"
+
+mkdir -p "$HOME/.local/share/color-schemes" "$HOME/.config"
+[ -f "$HOME/.config/kdeglobals" ] && [ ! -f "$HOME/.config/kdeglobals.nocturnal-bak" ] && cp "$HOME/.config/kdeglobals" "$HOME/.config/kdeglobals.nocturnal-bak"
+
+cat > "$HOME/.local/share/color-schemes/Nocturnal.colors" << KCOLORS
+[ColorEffects:Disabled]
+Color=18,19,26
+ColorAmount=0
+ColorEffect=0
+ContrastAmount=0.65
+ContrastEffect=1
+IntensityAmount=0.1
+IntensityEffect=2
+
+[Colors:Button]
+BackgroundAlternate=30,32,44
+BackgroundNormal=26,27,38
+DecorationFocus=$acc
+DecorationHover=$acc
+ForegroundActive=$acc
+ForegroundInactive=140,136,170
+ForegroundLink=$acc
+ForegroundNormal=230,225,255
+
+[Colors:Header]
+BackgroundAlternate=18,19,26
+BackgroundNormal=18,19,26
+DecorationFocus=$acc
+DecorationHover=$acc
+ForegroundActive=$acc
+ForegroundInactive=140,136,170
+ForegroundNormal=230,225,255
+
+[Colors:Selection]
+BackgroundAlternate=$acc
+BackgroundNormal=$acc
+DecorationFocus=$acc
+DecorationHover=$acc
+ForegroundActive=18,19,26
+ForegroundNormal=18,19,26
+
+[Colors:Tooltip]
+BackgroundAlternate=24,25,34
+BackgroundNormal=18,19,26
+ForegroundNormal=230,225,255
+
+[Colors:View]
+BackgroundAlternate=22,23,32
+BackgroundNormal=18,19,26
+DecorationFocus=$acc
+DecorationHover=$acc
+ForegroundActive=$acc
+ForegroundInactive=140,136,170
+ForegroundLink=$acc
+ForegroundNormal=230,225,255
+
+[Colors:Window]
+BackgroundAlternate=24,25,34
+BackgroundNormal=18,19,26
+DecorationFocus=$acc
+DecorationHover=$acc
+ForegroundActive=$acc
+ForegroundInactive=140,136,170
+ForegroundLink=$acc
+ForegroundNormal=230,225,255
+
+[General]
+ColorScheme=Nocturnal
+Name=Nocturnal
+shadeSortColumn=true
+KCOLORS
+
+if command -v kwriteconfig6 >/dev/null 2>&1; then
+    kwriteconfig6 --file kdeglobals --group General --key ColorScheme Nocturnal
+    for grp in Button Header Selection Tooltip View Window; do
+        sed -n "/^\[Colors:$grp\]/,/^\[/{ /^\[/d; /^$/d; p }" "$HOME/.local/share/color-schemes/Nocturnal.colors" | while IFS='=' read -r k v; do
+            kwriteconfig6 --file kdeglobals --group "Colors:$grp" --key "$k" "$v"
+        done
+    done
+else
+    cp "$HOME/.local/share/color-schemes/Nocturnal.colors" "$HOME/.config/kdeglobals"
+fi

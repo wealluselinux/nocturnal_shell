@@ -1,1 +1,1 @@
-{"accent":"#c9b8ff","wallpaper":"wall0.png","blurEnabled":true,"rounding":0,"dockEnabled":true,"dockPosition":"middle","launcherPosition":"left"}
+{"accent":"#c9b8ff","bg":"#12131a","panelOpacity":0.7,"shapeRadius":10,"themePreset":"Nocturnal","wallpaper":"/home/rig/nocturnal/wallpapers/wall0.png","blurEnabled":true,"rounding":10,"dockEnabled":true,"widgetsEnabled":true,"barPosition":"top","dockPosition":"middle","launcherPosition":"left","rightPillOrder":["wifi","stats","battery","volume"]}

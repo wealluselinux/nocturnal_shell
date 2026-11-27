@@ -1,0 +1,14 @@
+#!/bin/sh
+dir="$HOME/.cache/nocturnal"
+file="$dir/clipboard.txt"
+mkdir -p "$dir"
+touch "$file"
+
+wl-paste --type text --watch sh -c '
+    item=$(cat | tr "\n" " " | cut -c1-300)
+    [ -z "$item" ] && exit 0
+    tmp=$(mktemp)
+    printf "%s\n" "$item" > "$tmp"
+    grep -vxF "$item" "'"$file"'" | head -n 49 >> "$tmp"
+    mv "$tmp" "'"$file"'"
+'

@@ -1,0 +1,18 @@
+#!/bin/sh
+command -v kitty >/dev/null 2>&1 || exit 0
+acc="${1:-#c9b8ff}"
+mkdir -p "$HOME/.config/kitty"
+conf="$HOME/.config/kitty/kitty.conf"
+[ -f "$conf" ] && [ ! -f "$conf.nocturnal-bak" ] && cp "$conf" "$conf.nocturnal-bak"
+grep -qxF 'include nocturnal.conf' "$conf" 2>/dev/null || printf '\ninclude nocturnal.conf\n' >> "$conf"
+cat > "$HOME/.config/kitty/nocturnal.conf" << KCONF
+background #12131a
+foreground #e6e1ff
+background_opacity 0.78
+dynamic_background_opacity yes
+cursor $acc
+selection_background $acc
+selection_foreground #12131a
+active_border_color $acc
+KCONF
+pkill -USR1 kitty 2>/dev/null || true

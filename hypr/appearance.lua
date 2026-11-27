@@ -21,3 +21,12 @@ hl.config({
     animations = { enabled = false },
     misc = { disable_hyprland_logo = true },
 })
+
+-- Float and center file picker dialogs
+hl.window_rule({
+    name = "kdialog-popup",
+    match = { class = ".*kdialog.*" },
+    float = true,
+    size = {860, 560},
+    center = true,
+})

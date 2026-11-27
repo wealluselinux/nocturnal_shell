@@ -1,0 +1,120 @@
+#!/usr/bin/env python3
+import json, os, sys, urllib.request, urllib.error
+
+cfg_dir = os.path.expanduser("~/.config/nocturnal")
+cfg_path = os.path.join(cfg_dir, "ai.json")
+os.makedirs(cfg_dir, exist_ok=True)
+
+def load_cfg():
+    if os.path.exists(cfg_path):
+        try:
+            with open(cfg_path) as f:
+                return json.load(f)
+        except Exception:
+            pass
+    return {"provider": "groq", "gemini_key": "", "openai_key": "", "groq_key": "", "ollama_model": "llama3.2"}
+
+def save_cfg(cfg):
+    with open(cfg_path, "w") as f:
+        json.dump(cfg, f)
+    os.chmod(cfg_path, 0o600)
+
+if len(sys.argv) >= 2 and sys.argv[1] == "--set-key":
+    cfg = load_cfg()
+    prov = sys.argv[2]
+    key = sys.argv[3] if len(sys.argv) > 3 else ""
+    if prov == "gemini":
+        cfg["gemini_key"] = key
+    elif prov == "openai":
+        cfg["openai_key"] = key
+    elif prov == "groq":
+        cfg["groq_key"] = key
+    elif prov == "ollama" and key:
+        cfg["ollama_model"] = key
+    save_cfg(cfg)
+    print("Saved")
+    sys.exit(0)
+
+if len(sys.argv) >= 2 and sys.argv[1] == "--set-provider":
+    cfg = load_cfg()
+    cfg["provider"] = sys.argv[2]
+    save_cfg(cfg)
+    print(cfg["provider"])
+    sys.exit(0)
+
+if len(sys.argv) >= 2 and sys.argv[1] == "--get-provider":
+    print(load_cfg().get("provider", "groq"))
+    sys.exit(0)
+
+payload = json.loads(sys.stdin.read())
+messages = payload.get("messages", [])
+cfg = load_cfg()
+prov = cfg.get("provider", "groq")
+
+try:
+    if prov == "groq":
+        key = cfg.get("groq_key", "").strip()
+        if not key:
+            print("Set your Groq API key using the 🔑 button above.")
+            sys.exit(0)
+        m_req = urllib.request.Request("https://api.groq.com/openai/v1/models", headers={"User-Agent": "Nocturnal-AI/1.0", "Authorization": f"Bearer {key}"})
+        with urllib.request.urlopen(m_req, timeout=15) as m_resp:
+            avail = [m["id"] for m in json.loads(m_resp.read().decode()).get("data", []) if not any(x in m["id"].lower() for x in ("whisper", "tts", "guard", "prompt-guard", "safeguard"))]
+        model = next((m for m in avail if "llama" in m.lower()), avail[0] if avail else "llama-3.1-8b-instant")
+        url = "https://api.groq.com/openai/v1/chat/completions"
+        msgs = [{"role": m["role"], "content": m["text"]} for m in messages]
+        body = json.dumps({"model": model, "messages": msgs}).encode()
+        req = urllib.request.Request(url, data=body, headers={
+            "Content-Type": "application/json",
+            "User-Agent": "Nocturnal-AI/1.0",
+            "Authorization": f"Bearer {key}"
+        })
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            data = json.loads(resp.read().decode())
+        print(data["choices"][0]["message"]["content"].strip())
+
+    elif prov == "gemini":
+        key = cfg.get("gemini_key", "").strip()
+        if not key:
+            print("Set your Gemini API key using the 🔑 button above.")
+            sys.exit(0)
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key={key}"
+        contents = [
+            {"role": "model" if m["role"] == "assistant" else "user", "parts": [{"text": m["text"]}]}
+            for m in messages
+        ]
+        body = json.dumps({"contents": contents}).encode()
+        req = urllib.request.Request(url, data=body, headers={"Content-Type": "application/json"})
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            data = json.loads(resp.read().decode())
+        print(data["candidates"][0]["content"]["parts"][0]["text"].strip())
+
+    elif prov == "openai":
+        key = cfg.get("openai_key", "").strip()
+        if not key:
+            print("Set your OpenAI API key using the 🔑 button above.")
+            sys.exit(0)
+        url = "https://api.openai.com/v1/chat/completions"
+        msgs = [{"role": m["role"], "content": m["text"]} for m in messages]
+        body = json.dumps({"model": "gpt-4o-mini", "messages": msgs}).encode()
+        req = urllib.request.Request(url, data=body, headers={
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {key}"
+        })
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            data = json.loads(resp.read().decode())
+        print(data["choices"][0]["message"]["content"].strip())
+
+    elif prov == "ollama":
+        model = cfg.get("ollama_model", "llama3.2")
+        url = "http://localhost:11434/api/chat"
+        msgs = [{"role": m["role"], "content": m["text"]} for m in messages]
+        body = json.dumps({"model": model, "messages": msgs, "stream": False}).encode()
+        req = urllib.request.Request(url, data=body, headers={"Content-Type": "application/json"})
+        with urllib.request.urlopen(req, timeout=60) as resp:
+            data = json.loads(resp.read().decode())
+        print(data["message"]["content"].strip())
+except urllib.error.HTTPError as e:
+    print(f"API error {e.code}: {e.read().decode()[:200]}")
+except Exception as e:
+    print(f"Error: {e}")

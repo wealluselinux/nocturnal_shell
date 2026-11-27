@@ -60,7 +60,7 @@ Scope {
         anchors { bottom: true }
         margins { bottom: 0 }
         implicitWidth: 420
-        implicitHeight: 396
+        implicitHeight: 408
         color: "transparent"
 
         onVisibleChanged: {
@@ -104,7 +104,7 @@ Scope {
             anchors.fill: parent
             anchors.bottomMargin: 16
             radius: 18
-            color: "#cc12131a"
+            color: Theme.panelBg
             border.width: 1
             border.color: "#22ffffff"
 
