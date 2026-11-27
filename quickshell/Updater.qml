@@ -63,7 +63,7 @@ Scope {
             "rm -rf /tmp/nocturnal-userbak && " +
             "chmod +x bin/* && " +
             "cat VERSION > /tmp/nocturnal-updated && " +
-            "nohup sh -c 'sleep 0.5; pkill quickshell; nohup quickshell -p \"$HOME/nocturnal/quickshell/shell.qml\" >/dev/null 2>&1 &' >/dev/null 2>&1 &"
+            "setsid -f sh -c 'sleep 0.5; pkill -x quickshell; sleep 0.4; exec quickshell -p \"$HOME/nocturnal/quickshell/shell.qml\" >/dev/null 2>&1' </dev/null >/dev/null 2>&1"
         ]
         stdout: StdioCollector {
             onStreamFinished: { root.statusText = "Restarting Nocturnal Shell..." }

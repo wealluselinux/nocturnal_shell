@@ -1,12 +1,17 @@
 #!/bin/sh
 img="$1"
-[ -f "$img" ] || { notify-send "Nocturnal" "Wallpaper file not found: $img"; exit 1; }
+quiet="$2"
+[ -f "$img" ] || { [ "$quiet" = "--quiet" ] || notify-send "Nocturnal" "Wallpaper file not found: $img"; exit 1; }
+
+cache_dir="$HOME/.cache/nocturnal"
+mkdir -p "$cache_dir"
+printf '%s\n' "$img" > "$cache_dir/wallpaper"
 
 target="$img"
 case "$(printf '%s' "$img" | tr '[:upper:]' '[:lower:]')" in
     *.png) ;;
     *)
-        target="/tmp/nocturnal-wall.png"
+        target="$cache_dir/wall.png"
         if command -v magick >/dev/null 2>&1; then
             magick "$img" "$target"
         elif command -v ffmpeg >/dev/null 2>&1; then
@@ -14,10 +19,10 @@ case "$(printf '%s' "$img" | tr '[:upper:]' '[:lower:]')" in
         else
             python3 -c 'from PIL import Image; import sys; Image.open(sys.argv[1]).save(sys.argv[2], "PNG")' "$img" "$target"
         fi
-        [ -f "$target" ] || { notify-send "Nocturnal" "Could not convert wallpaper to PNG"; exit 1; }
+        [ -f "$target" ] || { [ "$quiet" = "--quiet" ] || notify-send "Nocturnal" "Could not convert wallpaper to PNG"; exit 1; }
         ;;
 esac
 
 pkill -x swaybg 2>/dev/null
-nohup swaybg -i "$target" -m fill >/dev/null 2>&1 &
-notify-send "Nocturnal" "Wallpaper set successfully"
+setsid -f swaybg -i "$target" -m fill </dev/null >/dev/null 2>&1 || nohup swaybg -i "$target" -m fill >/dev/null 2>&1 &
+[ "$quiet" = "--quiet" ] || notify-send "Nocturnal" "Wallpaper set successfully"
