@@ -35,8 +35,8 @@ echo "Detected OS:   $DISTRO_NAME"
 echo "Base family:   $BASE"
 echo ""
 echo "What this installer will do:"
-echo "  1. Install dependencies (Hyprland, Quickshell, Kitty, swaybg, grim, slurp, wl-clipboard, cava)"
-echo "  2. Set executable permissions on $DIR/bin/*"
+echo "  1. Install dependencies (Hyprland, Quickshell, Kitty, swaybg, grim, slurp, wl-clipboard, cava, curl, python3, kdialog, notify-send)"
+echo "  2. Set executable permissions on $DIR/bin/* and create ~/Pictures/{Wallpapers,Screenshots}"
 echo "  3. Install /usr/share/wayland-sessions/nocturnal.desktop (selectable at login)"
 echo ""
 printf "Are you ready for the installation? [y/N]: "
@@ -51,7 +51,7 @@ echo ""
 echo "Installing dependencies for $BASE..."
 case "$BASE" in
     arch)
-        sudo pacman -S --needed --noconfirm hyprland kitty swaybg grim slurp wl-clipboard cava qt6-wayland
+        sudo pacman -S --needed --noconfirm hyprland kitty swaybg grim slurp wl-clipboard cava curl python python-pillow kdialog libnotify qt6-wayland
         if ! command -v quickshell >/dev/null 2>&1; then
             if command -v yay >/dev/null 2>&1; then yay -S --needed --noconfirm quickshell-git
             elif command -v paru >/dev/null 2>&1; then paru -S --needed --noconfirm quickshell-git
@@ -60,26 +60,27 @@ case "$BASE" in
         ;;
     debian)
         sudo apt-get update
-        sudo apt-get install -y kitty swaybg grim slurp wl-clipboard cava curl python3
+        sudo apt-get install -y kitty swaybg grim slurp wl-clipboard cava curl python3 python3-pil kdialog libnotify-bin
         echo "Note: Make sure Hyprland and Quickshell are installed for your Debian/Ubuntu release."
         ;;
     fedora)
-        sudo dnf install -y hyprland kitty swaybg grim slurp wl-clipboard cava curl python3
+        sudo dnf install -y hyprland kitty swaybg grim slurp wl-clipboard cava curl python3 python3-pillow kdialog libnotify
         echo "Note: Install Quickshell via COPR or source if not in your repos."
         ;;
     gentoo)
-        sudo emerge --ask --noreplace gui-wm/hyprland x11-terms/kitty gui-apps/swaybg gui-apps/grim gui-apps/slurp gui-apps/wl-clipboard media-sound/cava
+        sudo emerge --ask --noreplace gui-wm/hyprland x11-terms/kitty gui-apps/swaybg gui-apps/grim gui-apps/slurp gui-apps/wl-clipboard media-sound/cava net-misc/curl dev-python/pillow kde-apps/kdialog x11-libs/libnotify
         ;;
     suse)
-        sudo zypper install -y hyprland kitty swaybg grim slurp wl-clipboard cava curl python3
+        sudo zypper install -y hyprland kitty swaybg grim slurp wl-clipboard cava curl python3 python3-Pillow kdialog libnotify-tools
         ;;
     *)
-        echo "Unknown base distro. Please install: hyprland quickshell kitty swaybg grim slurp wl-clipboard cava"
+        echo "Unknown base distro. Please install: hyprland quickshell kitty swaybg grim slurp wl-clipboard cava curl python3 pillow kdialog notify-send"
         ;;
 esac
 
-# 3. Permissions + Session entry
+# 3. Permissions, folders, & Session entry
 chmod +x "$DIR/bin/"* 2>/dev/null || true
+mkdir -p "$HOME/Pictures/Wallpapers" "$HOME/Pictures/Screenshots"
 sed "s|/home/rig/nocturnal|$DIR|g" "$DIR/session/nocturnal.desktop" > /tmp/nocturnal.desktop
 sudo install -m 644 /tmp/nocturnal.desktop /usr/share/wayland-sessions/nocturnal.desktop
 rm -f /tmp/nocturnal.desktop
