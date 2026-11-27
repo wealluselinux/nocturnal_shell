@@ -355,3 +355,4 @@ hl.window_rule({
     float = true,
 })
 require("appearance")
+require("mybinds")
