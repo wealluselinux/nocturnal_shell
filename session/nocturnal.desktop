@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=Nocturnal
+Comment=Nocturnal, a dark minimal Hyprland desktop
+Exec=/home/rig/nocturnal/bin/nocturnal-session
+Type=Application
+DesktopNames=Hyprland
