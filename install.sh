@@ -52,7 +52,7 @@ echo ""
 echo "Installing dependencies for $BASE..."
 case "$BASE" in
     arch)
-        sudo pacman -S --needed --noconfirm hyprland kitty swaybg grim slurp wl-clipboard cava curl python python-pillow kdialog libnotify qt6-wayland
+        sudo pacman -S --needed --noconfirm hyprland kitty swaybg grim slurp wl-clipboard cava curl python python-pillow kdialog libnotify qt6-wayland dbus
         if ! command -v quickshell >/dev/null 2>&1; then
             if command -v yay >/dev/null 2>&1; then yay -S --needed --noconfirm quickshell-git
             elif command -v paru >/dev/null 2>&1; then paru -S --needed --noconfirm quickshell-git
@@ -61,18 +61,19 @@ case "$BASE" in
         ;;
     debian)
         sudo apt-get update
-        sudo apt-get install -y kitty swaybg grim slurp wl-clipboard cava curl python3 python3-pil kdialog libnotify-bin
-        echo "Note: Make sure Hyprland and Quickshell are installed for your Debian/Ubuntu release."
+        sudo apt-get install -y hyprland kitty swaybg grim slurp wl-clipboard cava curl python3 python3-pil kdialog libnotify-bin dbus-x11 || \
+        sudo apt-get install -y kitty swaybg grim slurp wl-clipboard cava curl python3 python3-pil kdialog libnotify-bin dbus-x11
+        echo "Note: Make sure Hyprland (0.55+) and Quickshell are installed for your Debian/Ubuntu release."
         ;;
     fedora)
-        sudo dnf install -y hyprland kitty swaybg grim slurp wl-clipboard cava curl python3 python3-pillow kdialog libnotify
+        sudo dnf install -y hyprland kitty swaybg grim slurp wl-clipboard cava curl python3 python3-pillow kdialog libnotify dbus-x11
         echo "Note: Install Quickshell via COPR or source if not in your repos."
         ;;
     gentoo)
         sudo emerge --ask --noreplace gui-wm/hyprland x11-terms/kitty gui-apps/swaybg gui-apps/grim gui-apps/slurp gui-apps/wl-clipboard media-sound/cava net-misc/curl dev-python/pillow kde-apps/kdialog x11-libs/libnotify
         ;;
     suse)
-        sudo zypper install -y hyprland kitty swaybg grim slurp wl-clipboard cava curl python3 python3-Pillow kdialog libnotify-tools
+        sudo zypper install -y hyprland kitty swaybg grim slurp wl-clipboard cava curl python3 python3-Pillow kdialog libnotify-tools dbus-1-x11
         ;;
     *)
         echo "Unknown base distro. Please install: hyprland quickshell kitty swaybg grim slurp wl-clipboard cava curl python3 pillow kdialog notify-send"
