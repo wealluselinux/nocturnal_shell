@@ -356,3 +356,4 @@ hl.window_rule({
 })
 require("appearance")
 require("mybinds")
+require("autostart")
