@@ -15,8 +15,18 @@ Scope {
         target: "updater"
         function start(ver: string): void {
             root.newVersion = ver
-            root.statusText = "Updating Nocturnal Shell to v" + ver + "..."
+            root.statusText = "Preparing update to v" + ver + "..."
             root.updating = true
+            updateDelayTimer.restart()
+        }
+    }
+
+    Timer {
+        id: updateDelayTimer
+        interval: 5000
+        repeat: false
+        onTriggered: {
+            root.statusText = "Updating Nocturnal Shell to v" + root.newVersion + "..."
             updateProc.running = true
         }
     }
