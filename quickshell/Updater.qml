@@ -9,13 +9,29 @@ Scope {
     property bool showDoneBanner: false
     property string statusText: "Downloading Nocturnal update..."
     property string newVersion: ""
+    property string updateAction: "update" // "update" | "reinstall" | "rollback"
     property string homeDir: Quickshell.env("HOME") || ""
 
     IpcHandler {
         target: "updater"
         function start(ver: string): void {
+            root.updateAction = "update"
             root.newVersion = ver
             root.statusText = "Preparing update to v" + ver + "..."
+            root.updating = true
+            updateDelayTimer.restart()
+        }
+        function reinstall(): void {
+            root.updateAction = "reinstall"
+            root.newVersion = ""
+            root.statusText = "Preparing clean reinstall..."
+            root.updating = true
+            updateDelayTimer.restart()
+        }
+        function rollback(): void {
+            root.updateAction = "rollback"
+            root.newVersion = ""
+            root.statusText = "Preparing downgrade to previous version..."
             root.updating = true
             updateDelayTimer.restart()
         }
@@ -26,8 +42,16 @@ Scope {
         interval: 5000
         repeat: false
         onTriggered: {
-            root.statusText = "Updating Nocturnal Shell to v" + root.newVersion + "..."
-            updateProc.running = true
+            if (root.updateAction === "reinstall") {
+                root.statusText = "Reinstalling Nocturnal Shell..."
+                reinstallProc.running = true
+            } else if (root.updateAction === "rollback") {
+                root.statusText = "Downgrading to previous version..."
+                rollbackProc.running = true
+            } else {
+                root.statusText = "Updating Nocturnal Shell to v" + root.newVersion + "..."
+                updateProc.running = true
+            }
         }
     }
 
@@ -51,23 +75,34 @@ Scope {
 
     Timer { id: doneTimer; interval: 4500; onTriggered: root.showDoneBanner = false }
 
+    readonly property string backupPrefix:
+        "mkdir -p /tmp/nocturnal-userbak && " +
+        "for f in settings.json pinned.json widgets.json; do [ -f \"$HOME/nocturnal/quickshell/$f\" ] && cp \"$HOME/nocturnal/quickshell/$f\" \"/tmp/nocturnal-userbak/$f\"; done && " +
+        "cd \"$HOME/nocturnal\" && "
+
+    readonly property string restoreSuffix:
+        " && for f in settings.json pinned.json widgets.json; do [ -f \"/tmp/nocturnal-userbak/$f\" ] && cp \"/tmp/nocturnal-userbak/$f\" \"$HOME/nocturnal/quickshell/$f\"; done && " +
+        "rm -rf /tmp/nocturnal-userbak && " +
+        "chmod +x bin/* && " +
+        "cat VERSION > /tmp/nocturnal-updated && " +
+        "setsid -f sh -c 'sleep 0.5; pkill -x quickshell; sleep 0.4; exec quickshell -p \"$HOME/nocturnal/quickshell/shell.qml\" >/dev/null 2>&1' </dev/null >/dev/null 2>&1"
+
     Process {
         id: updateProc
-        command: ["sh", "-c",
-            "mkdir -p /tmp/nocturnal-userbak && " +
-            "for f in settings.json pinned.json widgets.json; do [ -f \"$HOME/nocturnal/quickshell/$f\" ] && cp \"$HOME/nocturnal/quickshell/$f\" \"/tmp/nocturnal-userbak/$f\"; done && " +
-            "cd \"$HOME/nocturnal\" && " +
-            "(git -c core.fileMode=false stash -q 2>/dev/null || true) && " +
-            "git -c core.fileMode=false pull --rebase origin main && " +
-            "for f in settings.json pinned.json widgets.json; do [ -f \"/tmp/nocturnal-userbak/$f\" ] && cp \"/tmp/nocturnal-userbak/$f\" \"$HOME/nocturnal/quickshell/$f\"; done && " +
-            "rm -rf /tmp/nocturnal-userbak && " +
-            "chmod +x bin/* && " +
-            "cat VERSION > /tmp/nocturnal-updated && " +
-            "setsid -f sh -c 'sleep 0.5; pkill -x quickshell; sleep 0.4; exec quickshell -p \"$HOME/nocturnal/quickshell/shell.qml\" >/dev/null 2>&1' </dev/null >/dev/null 2>&1"
-        ]
-        stdout: StdioCollector {
-            onStreamFinished: { root.statusText = "Restarting Nocturnal Shell..." }
-        }
+        command: ["sh", "-c", root.backupPrefix + "(git -c core.fileMode=false stash -q 2>/dev/null || true) && git -c core.fileMode=false pull --rebase origin main" + root.restoreSuffix]
+        stdout: StdioCollector { onStreamFinished: { root.statusText = "Restarting Nocturnal Shell..." } }
+    }
+
+    Process {
+        id: reinstallProc
+        command: ["sh", "-c", root.backupPrefix + "git fetch origin main && git reset --hard origin/main" + root.restoreSuffix]
+        stdout: StdioCollector { onStreamFinished: { root.statusText = "Restarting Nocturnal Shell..." } }
+    }
+
+    Process {
+        id: rollbackProc
+        command: ["sh", "-c", root.backupPrefix + "git reset --hard HEAD~1" + root.restoreSuffix]
+        stdout: StdioCollector { onStreamFinished: { root.statusText = "Restarting Nocturnal Shell..." } }
     }
 
     Variants {

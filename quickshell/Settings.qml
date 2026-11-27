@@ -12,7 +12,7 @@ Scope {
     property string osPretty: "Linux"
     property string userHost: Quickshell.env("USER") || "rig"
     property string uptimeStr: "up 0m"
-    property string localVer: "1.2.3"
+    property string localVer: "1.2.5"
     readonly property string codename: "Crescent"
     property string remoteVer: ""
     property string updateMsg: ""
@@ -68,7 +68,7 @@ Scope {
 
     Process {
         id: verProc
-        command: ["sh", "-c", "cat \"$HOME/nocturnal/VERSION\" 2>/dev/null || echo 1.2.3"]
+        command: ["sh", "-c", "cat \"$HOME/nocturnal/VERSION\" 2>/dev/null || echo 1.2.5"]
         stdout: StdioCollector { id: vCol; onStreamFinished: { var v = vCol.text.trim(); if (v) root.localVer = v } }
     }
 
@@ -529,7 +529,7 @@ Scope {
                         // TAB 4: ABOUT & UPDATES
                         Column {
                             visible: root.activeTab === "about"
-                            anchors.fill: parent; spacing: 14
+                            anchors.fill: parent; spacing: 12
 
                             Row {
                                 spacing: 14
@@ -607,7 +607,7 @@ Scope {
 
                             Rectangle { width: parent.width; height: 1; color: Theme.border }
                             Column {
-                                spacing: 6
+                                spacing: 5
                                 Text { text: "Compositor: Hyprland (Lua)"; color: Theme.textMuted; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 13 }
                                 Text { text: "Shell UI:   Quickshell (QML)"; color: Theme.textMuted; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 13 }
                                 Text { text: "OS:         " + root.osPretty; color: Theme.textMuted; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 13 }
@@ -616,6 +616,19 @@ Scope {
                                 spacing: 10
                                 Rectangle { width: 170; height: 34; radius: 8; color: Theme.surface; border.width: 1; border.color: Theme.accent; Text { anchors.centerIn: parent; text: "Check for Updates"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 12 } MouseArea { anchors.fill: parent; onClicked: { root.updateMsg = "Checking..."; checkUpdProc.running = true } } }
                                 Rectangle { visible: root.remoteVer !== "" && root.remoteVer !== root.localVer; width: 130; height: 34; radius: 8; color: Theme.accent; Text { anchors.centerIn: parent; text: "Update Now"; color: Theme.lightMode ? "#ffffff" : "#12131a"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 12; font.bold: true } MouseArea { anchors.fill: parent; onClicked: { root.open = false; Quickshell.execDetached(["quickshell", "ipc", "-p", root.homeDir + "/nocturnal/quickshell/shell.qml", "call", "updater", "start", root.remoteVer]) } } }
+                            }
+                            Row {
+                                spacing: 10
+                                Rectangle {
+                                    width: 170; height: 32; radius: 8; color: Theme.surface; border.width: 1; border.color: Theme.border
+                                    Text { anchors.centerIn: parent; text: "Reinstall / Repair"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 }
+                                    MouseArea { anchors.fill: parent; onClicked: { root.open = false; Quickshell.execDetached(["quickshell", "ipc", "-p", root.homeDir + "/nocturnal/quickshell/shell.qml", "call", "updater", "reinstall"]) } }
+                                }
+                                Rectangle {
+                                    width: 185; height: 32; radius: 8; color: Theme.surface; border.width: 1; border.color: Theme.border
+                                    Text { anchors.centerIn: parent; text: "Downgrade (Previous)"; color: Theme.textMuted; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 }
+                                    MouseArea { anchors.fill: parent; onClicked: { root.open = false; Quickshell.execDetached(["quickshell", "ipc", "-p", root.homeDir + "/nocturnal/quickshell/shell.qml", "call", "updater", "rollback"]) } }
+                                }
                             }
                             Text { visible: root.updateMsg !== ""; text: root.updateMsg; color: Theme.textMuted; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 12 }
                         }
