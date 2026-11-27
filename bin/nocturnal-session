@@ -3,11 +3,14 @@ export XDG_CURRENT_DESKTOP=Hyprland
 export XDG_SESSION_TYPE=wayland
 export XDG_SESSION_DESKTOP=nocturnal
 export QT_QPA_PLATFORMTHEME=kde
+export PATH="/usr/local/bin:$HOME/.nix-profile/bin:/nix/var/nix/profiles/default/bin:$PATH"
 
 if [ -x /usr/libexec/hyprland-dbus-run-session-if-needed ] && command -v start-hyprland >/dev/null 2>&1; then
     exec /usr/libexec/hyprland-dbus-run-session-if-needed /usr/bin/start-hyprland -- -c "$HOME/nocturnal/hypr/hyprland.lua"
+elif command -v nixGL >/dev/null 2>&1 && command -v start-hyprland >/dev/null 2>&1; then
+    exec nixGL start-hyprland -- -c "$HOME/nocturnal/hypr/hyprland.lua"
 elif command -v start-hyprland >/dev/null 2>&1; then
-    exec dbus-run-session start-hyprland -- -c "$HOME/nocturnal/hypr/hyprland.lua"
+    exec start-hyprland -- -c "$HOME/nocturnal/hypr/hyprland.lua"
 else
-    exec dbus-run-session Hyprland -c "$HOME/nocturnal/hypr/hyprland.lua"
+    exec Hyprland -c "$HOME/nocturnal/hypr/hyprland.lua"
 fi
