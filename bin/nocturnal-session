@@ -1,0 +1,5 @@
+#!/bin/sh
+export XDG_CURRENT_DESKTOP=Hyprland
+export XDG_SESSION_TYPE=wayland
+export XDG_SESSION_DESKTOP=nocturnal
+exec /usr/libexec/hyprland-dbus-run-session-if-needed /usr/bin/start-hyprland -- -c "$HOME/nocturnal/hypr/hyprland.lua"
