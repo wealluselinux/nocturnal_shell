@@ -62,17 +62,11 @@ Variants {
             }
         }
 
-        // Right pill: placeholder, our widgets go here next
+        // Right pill: widgets (weather now, volume and more next)
         Pill {
             anchors.right: parent.right
 
-            Text {
-                anchors.verticalCenter: parent.verticalCenter
-                text: "Nocturnal"
-                color: "#c9b8ff"
-                font.family: "Google Sans Flex"
-                font.pixelSize: 15
-            }
+            Weather {}
         }
     }
 }
