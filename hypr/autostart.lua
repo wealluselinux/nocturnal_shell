@@ -4,4 +4,5 @@ local wallpaper = home .. "/nocturnal/wallpapers/wall0.png"
 
 hl.on("hyprland.start", function()
     hl.exec_cmd("swaybg -i " .. wallpaper .. " -m fill")
+    hl.exec_cmd("quickshell -p " .. home .. "/nocturnal/quickshell/shell.qml")
 end)
