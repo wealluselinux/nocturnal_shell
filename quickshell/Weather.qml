@@ -7,7 +7,7 @@ Text {
 
     text: info
     color: "#e6e1ff"
-    font.family: "Google Sans Flex"
+    font.family: "JetBrainsMono Nerd Font"
     font.pixelSize: 15
     anchors.verticalCenter: parent.verticalCenter
 

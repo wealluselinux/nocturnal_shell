@@ -9,9 +9,16 @@ Variants {
         required property var modelData
         screen: modelData
 
-        anchors { top: true }
-        margins { top: 8 }
-        implicitWidth: Math.round(modelData.width * 0.5)
+        anchors {
+            top: true
+            left: true
+            right: true
+        }
+        margins {
+            top: 8
+            left: 8
+            right: 8
+        }
         implicitHeight: 38
         color: "transparent"
 
@@ -20,33 +27,38 @@ Variants {
             precision: SystemClock.Minutes
         }
 
-        // Left pill: workspaces
-        Pill {
+        // Left side: workspaces + music player pill
+        Row {
             anchors.left: parent.left
+            spacing: 8
 
-            Row {
-                spacing: 6
-                anchors.verticalCenter: parent.verticalCenter
+            Pill {
+                Row {
+                    spacing: 6
+                    anchors.verticalCenter: parent.verticalCenter
 
-                Repeater {
-                    model: Hyprland.workspaces
+                    Repeater {
+                        model: Hyprland.workspaces
 
-                    Rectangle {
-                        required property var modelData
-                        width: modelData.focused ? 28 : 10
-                        height: 10
-                        radius: 5
-                        color: modelData.focused ? "#c9b8ff" : "#55ffffff"
+                        Rectangle {
+                            required property var modelData
+                            width: modelData.focused ? 28 : 10
+                            height: 10
+                            radius: 5
+                            color: modelData.focused ? Theme.accent : "#55ffffff"
 
-                        Behavior on width { NumberAnimation { duration: 120 } }
+                            Behavior on width { NumberAnimation { duration: 120 } }
 
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: modelData.activate()
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: modelData.activate()
+                            }
                         }
                     }
                 }
             }
+
+            Music {}
         }
 
         // Center pill: date and time
@@ -57,17 +69,23 @@ Variants {
                 anchors.verticalCenter: parent.verticalCenter
                 text: Qt.formatDateTime(clock.date, "ddd d MMM  ·  h:mm AP")
                 color: "#e6e1ff"
-                font.family: "Google Sans Flex"
+                font.family: "JetBrainsMono Nerd Font"
                 font.pixelSize: 15
             }
         }
 
-        // Right pill: widgets (weather now, volume and more next)
-        Pill {
+        // Right side: separate pills for weather and volume
+        Row {
             anchors.right: parent.right
+            spacing: 8
 
-            Weather {}
-            Volume {}
+            Pill {
+                Weather {}
+            }
+
+            Pill {
+                Volume {}
+            }
         }
     }
 }
