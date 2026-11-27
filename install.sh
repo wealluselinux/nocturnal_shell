@@ -75,6 +75,11 @@ case "$BASE" in
 esac
 
 # 3. Ensure Hyprland & Quickshell are installed (fallback to Nix on Debian/Ubuntu/etc.)
+nix_add() {
+    nix --extra-experimental-features 'nix-command flakes' profile add "$1" 2>/dev/null || \
+    nix --extra-experimental-features 'nix-command flakes' profile install "$1"
+}
+
 if ! command -v Hyprland >/dev/null 2>&1 || ! command -v quickshell >/dev/null 2>&1; then
     echo ""
     echo "Hyprland or Quickshell not found in native repos — installing via Nix..."
@@ -85,16 +90,18 @@ if ! command -v Hyprland >/dev/null 2>&1 || ! command -v quickshell >/dev/null 2
     export PATH="$HOME/.nix-profile/bin:/nix/var/nix/profiles/default/bin:$PATH"
 
     if ! command -v Hyprland >/dev/null 2>&1; then
-        nix --extra-experimental-features 'nix-command flakes' profile install nixpkgs#hyprland
+        nix_add nixpkgs#hyprland
     fi
     if ! command -v quickshell >/dev/null 2>&1; then
-        nix --extra-experimental-features 'nix-command flakes' profile install nixpkgs#quickshell
+        nix_add nixpkgs#quickshell
     fi
 
     # Symlink into /usr/local/bin so GDM and nocturnal-session always find them
     for b in Hyprland start-hyprland hyprctl quickshell qs; do
         if [ -x "$HOME/.nix-profile/bin/$b" ]; then
             sudo ln -sf "$HOME/.nix-profile/bin/$b" "/usr/local/bin/$b"
+        elif [ -x "/nix/var/nix/profiles/default/bin/$b" ]; then
+            sudo ln -sf "/nix/var/nix/profiles/default/bin/$b" "/usr/local/bin/$b"
         fi
     done
 fi
