@@ -36,8 +36,9 @@ echo "Base family:   $BASE"
 echo ""
 echo "What this installer will do:"
 echo "  1. Install dependencies (Hyprland, Quickshell, Kitty, swaybg, grim, slurp, wl-clipboard, cava, curl, python3, kdialog, notify-send)"
-echo "  2. Set executable permissions on $DIR/bin/* and create ~/Pictures/{Wallpapers,Screenshots}"
-echo "  3. Install /usr/share/wayland-sessions/nocturnal.desktop (selectable at login)"
+echo "  2. Reset shell settings to clean Nocturnal defaults (default wall0.png wallpaper)"
+echo "  3. Set executable permissions on $DIR/bin/* and create ~/Pictures/{Wallpapers,Screenshots}"
+echo "  4. Install /usr/share/wayland-sessions/nocturnal.desktop (selectable at login)"
 echo ""
 printf "Are you ready for the installation? [y/N]: "
 read -r ans
@@ -78,7 +79,14 @@ case "$BASE" in
         ;;
 esac
 
-# 3. Permissions, folders, & Session entry
+# 3. Reset settings to clean Nocturnal defaults
+rm -f "$DIR/quickshell/settings.json" "$DIR/quickshell/pinned.json" "$HOME/.cache/nocturnal/clipboard.txt"
+cat > "$DIR/quickshell/settings.json" << 'JSON'
+{"lightMode":false,"accent":"#c9b8ff","themePreset":"Nocturnal","wallpaper":"wall0.png","panelOpacity":0.85,"shapeRadius":12,"blurEnabled":true,"rounding":14,"dockEnabled":true,"widgetsEnabled":true,"widgetClock":true,"widgetAnalog":true,"widgetMusic":true,"widgetSound":true,"dockAutoHide":false,"cavaEnabled":false,"use24h":false,"volumeLimit":100,"barPosition":"top","dockPosition":"middle","launcherPosition":"middle"}
+JSON
+echo "[]" > "$DIR/quickshell/pinned.json"
+
+# 4. Permissions, folders, & Session entry
 chmod +x "$DIR/bin/"* 2>/dev/null || true
 mkdir -p "$HOME/Pictures/Wallpapers" "$HOME/Pictures/Screenshots"
 sed "s|/home/rig/nocturnal|$DIR|g" "$DIR/session/nocturnal.desktop" > /tmp/nocturnal.desktop
