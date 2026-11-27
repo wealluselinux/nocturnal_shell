@@ -16,6 +16,13 @@ Singleton {
     property int rounding: 14
     property bool dockEnabled: true
     property bool widgetsEnabled: true
+    property bool widgetClock: true
+    property bool widgetAnalog: true
+    property bool widgetMusic: true
+    property bool widgetSound: true
+    property bool dockAutoHide: false
+    property bool use24h: false
+    property int volumeLimit: 100
     property string barPosition: "top"
     property string dockPosition: "middle"
     property string launcherPosition: "middle"
@@ -40,6 +47,13 @@ Singleton {
                 if (data.rounding !== undefined) theme.rounding = data.rounding
                 if (data.dockEnabled !== undefined) theme.dockEnabled = data.dockEnabled
                 if (data.widgetsEnabled !== undefined) theme.widgetsEnabled = data.widgetsEnabled
+                if (data.widgetClock !== undefined) theme.widgetClock = data.widgetClock
+                if (data.widgetAnalog !== undefined) theme.widgetAnalog = data.widgetAnalog
+                if (data.widgetMusic !== undefined) theme.widgetMusic = data.widgetMusic
+                if (data.widgetSound !== undefined) theme.widgetSound = data.widgetSound
+                if (data.dockAutoHide !== undefined) theme.dockAutoHide = data.dockAutoHide
+                if (data.use24h !== undefined) theme.use24h = data.use24h
+                if (data.volumeLimit !== undefined) theme.volumeLimit = data.volumeLimit
                 if (data.barPosition) theme.barPosition = data.barPosition
                 if (data.dockPosition) theme.dockPosition = data.dockPosition
                 if (data.launcherPosition) theme.launcherPosition = data.launcherPosition
@@ -79,6 +93,13 @@ Singleton {
             rounding: theme.rounding,
             dockEnabled: theme.dockEnabled,
             widgetsEnabled: theme.widgetsEnabled,
+            widgetClock: theme.widgetClock,
+            widgetAnalog: theme.widgetAnalog,
+            widgetMusic: theme.widgetMusic,
+            widgetSound: theme.widgetSound,
+            dockAutoHide: theme.dockAutoHide,
+            use24h: theme.use24h,
+            volumeLimit: theme.volumeLimit,
             barPosition: theme.barPosition,
             dockPosition: theme.dockPosition,
             launcherPosition: theme.launcherPosition,

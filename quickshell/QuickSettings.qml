@@ -172,6 +172,7 @@ Item {
                             height: 36
                             radius: 18
                             color: root.activeTab === modelData.id ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.25) : "transparent"
+                            Behavior on color { ColorAnimation { duration: 160 } }
 
                             Row {
                                 anchors.centerIn: parent
@@ -203,7 +204,10 @@ Item {
 
                 // TAB 1: DASHBOARD (assd.png layout)
                 Row {
-                    visible: root.activeTab === "dashboard"
+                    opacity: root.activeTab === "dashboard" ? 1 : 0
+                    visible: opacity > 0.01
+                    Behavior on opacity { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
+                    transform: Translate { y: root.activeTab === "dashboard" ? 0 : 8; Behavior on y { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } } }
                     width: parent.width
                     height: parent.height - 48
                     spacing: 10
@@ -503,7 +507,10 @@ Item {
 
                 // TAB 2: QUICK TOGGLES (Wi-Fi, Bluetooth, Audio, Game Mode, Airplane Mode, Keep Awake, Blur, Dock)
                 Grid {
-                    visible: root.activeTab === "toggles"
+                    opacity: root.activeTab === "toggles" ? 1 : 0
+                    visible: opacity > 0.01
+                    Behavior on opacity { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
+                    transform: Translate { y: root.activeTab === "toggles" ? 0 : 8; Behavior on y { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } } }
                     width: parent.width
                     columns: 2
                     spacing: 10
@@ -690,7 +697,10 @@ Item {
 
                 // TAB 3: QUICK WALLPAPER PICKER
                 GridView {
-                    visible: root.activeTab === "wallpaper"
+                    opacity: root.activeTab === "wallpaper" ? 1 : 0
+                    visible: opacity > 0.01
+                    Behavior on opacity { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
+                    transform: Translate { y: root.activeTab === "wallpaper" ? 0 : 8; Behavior on y { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } } }
                     width: parent.width
                     height: parent.height - 48
                     cellWidth: 162

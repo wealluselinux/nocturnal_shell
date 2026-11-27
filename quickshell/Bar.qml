@@ -1,6 +1,7 @@
 import Quickshell
 import Quickshell.Io
 import Quickshell.Hyprland
+import Quickshell.Widgets
 import Quickshell.Services.Pipewire
 import QtQuick
 
@@ -45,6 +46,7 @@ Variants {
         property string ram: "0G"
         property string bat: ""
         property bool charging: false
+        property int lastBatWarn: 100
 
         Process {
             id: statsProc
@@ -67,6 +69,18 @@ Variants {
                         barWin.ram = p[2]
                         barWin.bat = p[3]
                         barWin.charging = (p[4] === "Charging")
+                        var bnum = parseInt(barWin.bat)
+                        if (!barWin.charging && !isNaN(bnum)) {
+                            if (bnum <= 10 && barWin.lastBatWarn > 10) {
+                                barWin.lastBatWarn = 10
+                                Quickshell.execDetached(["notify-send", "-u", "critical", "Battery Critical", bnum + "% remaining — plug in charger!"])
+                            } else if (bnum <= 20 && barWin.lastBatWarn > 20) {
+                                barWin.lastBatWarn = 20
+                                Quickshell.execDetached(["notify-send", "-u", "normal", "Battery Low", bnum + "% remaining"])
+                            }
+                        } else if (barWin.charging) {
+                            barWin.lastBatWarn = 100
+                        }
                     }
                 }
             }
@@ -119,20 +133,61 @@ Variants {
                         spacing: 4
                         anchors.verticalCenter: parent.verticalCenter
                         Repeater {
-                            model: Hyprland.workspaces
+                            model: 10
                             Rectangle {
-                                required property var modelData
-                                width: 24; height: 24; radius: 6
-                                color: modelData.focused ? Theme.accent : "#1affffff"
-                                Text {
-                                    anchors.centerIn: parent
-                                    text: modelData.id
-                                    color: modelData.focused ? "#12131a" : "#e6e1ff"
-                                    font.family: "JetBrainsMono Nerd Font"
-                                    font.pixelSize: 12
-                                    font.bold: modelData.focused
+                                id: wsBtn
+                                required property int index
+                                readonly property int wsId: index + 1
+                                readonly property bool isFocused: Hyprland.focusedWorkspace !== null && Hyprland.focusedWorkspace.id === wsId
+                                readonly property var wsApps: {
+                                    var list = Hyprland.toplevels.values
+                                    var out = []
+                                    for (var i = 0; i < list.length; i++) {
+                                        var t = list[i]
+                                        if (t.workspace && t.workspace.id === wsBtn.wsId) out.push(t)
+                                    }
+                                    return out
                                 }
-                                MouseArea { anchors.fill: parent; onClicked: modelData.activate() }
+
+                                width: Math.max(24, wsInner.implicitWidth + 10)
+                                height: 24
+                                radius: 6
+                                color: isFocused ? Theme.accent : (wsApps.length > 0 ? "#24ffffff" : "#10ffffff")
+                                Behavior on color { ColorAnimation { duration: 180 } }
+                                Behavior on width { NumberAnimation { duration: 150; easing.type: Easing.OutCubic } }
+
+                                Row {
+                                    id: wsInner
+                                    anchors.centerIn: parent
+                                    spacing: 4
+
+                                    Text {
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        text: wsBtn.wsId
+                                        color: wsBtn.isFocused ? "#12131a" : (wsBtn.wsApps.length > 0 ? "#e6e1ff" : "#77e6e1ff")
+                                        font.family: "JetBrainsMono Nerd Font"
+                                        font.pixelSize: 11
+                                        font.bold: wsBtn.isFocused
+                                    }
+
+                                    Repeater {
+                                        model: wsBtn.wsApps
+                                        IconImage {
+                                            required property var modelData
+                                            anchors.verticalCenter: parent.verticalCenter
+                                            implicitSize: 14
+                                            readonly property string appId: modelData.wayland ? modelData.wayland.appId : ""
+                                            readonly property var entry: appId ? (DesktopEntries.heuristicLookup(appId) || DesktopEntries.byId(appId)) : null
+                                            source: entry ? Quickshell.iconPath(entry.icon, true) : (appId ? Quickshell.iconPath(appId.toLowerCase(), true) : "")
+                                            visible: source !== ""
+                                        }
+                                    }
+                                }
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: Quickshell.execDetached(["hyprctl", "dispatch", "hl.dsp.focus({ workspace = " + wsBtn.wsId + " })"])
+                                }
                             }
                         }
                     }
@@ -152,7 +207,7 @@ Variants {
                         anchors.verticalCenter: parent.verticalCenter
                         Text {
                             id: clockText
-                            text: Qt.formatDateTime(clock.date, "h:mm AP  ·  ddd d MMM")
+                            text: Qt.formatDateTime(clock.date, Theme.use24h ? "HH:mm  ·  ddd d MMM" : "h:mm AP  ·  ddd d MMM")
                             color: "#e6e1ff"
                             font.family: "JetBrainsMono Nerd Font"
                             font.pixelSize: 13
@@ -228,7 +283,7 @@ Variants {
                                 onWheel: (wheel) => {
                                     if (rPill.modelData !== "volume" || !barWin.audioReady) return
                                     var step = wheel.angleDelta.y > 0 ? 0.05 : -0.05
-                                    barWin.sink.audio.volume = Math.max(0, Math.min(1, barWin.vol + step))
+                                    barWin.sink.audio.volume = Math.max(0, Math.min(Theme.volumeLimit / 100.0, barWin.vol + step))
                                 }
                             }
                         }
@@ -269,20 +324,21 @@ Variants {
                         anchors.centerIn: parent
                         spacing: 4
                         Repeater {
-                            model: Hyprland.workspaces
+                            model: 10
                             Rectangle {
                                 required property var modelData
                                 width: 26; height: 26; radius: 6
-                                color: modelData.focused ? Theme.accent : "#1affffff"
+                                color: (Hyprland.focusedWorkspace && Hyprland.focusedWorkspace.id === index + 1) ? Theme.accent : "#1affffff"
+                                Behavior on color { ColorAnimation { duration: 180 } }
                                 Text {
                                     anchors.centerIn: parent
-                                    text: modelData.id
-                                    color: modelData.focused ? "#12131a" : "#e6e1ff"
+                                    text: index + 1
+                                    color: (Hyprland.focusedWorkspace && Hyprland.focusedWorkspace.id === index + 1) ? "#12131a" : "#e6e1ff"
                                     font.family: "JetBrainsMono Nerd Font"
                                     font.pixelSize: 12
-                                    font.bold: modelData.focused
+                                    font.bold: (Hyprland.focusedWorkspace && Hyprland.focusedWorkspace.id === index + 1)
                                 }
-                                MouseArea { anchors.fill: parent; onClicked: modelData.activate() }
+                                MouseArea { anchors.fill: parent; onClicked: Quickshell.execDetached(["hyprctl", "dispatch", "hl.dsp.focus({ workspace = " + (index + 1) + " })"]) }
                             }
                         }
                     }
@@ -362,7 +418,7 @@ Variants {
                     onWheel: (wheel) => {
                         if (!barWin.audioReady) return
                         var step = wheel.angleDelta.y > 0 ? 0.05 : -0.05
-                        barWin.sink.audio.volume = Math.max(0, Math.min(1, barWin.vol + step))
+                        barWin.sink.audio.volume = Math.max(0, Math.min(Theme.volumeLimit / 100.0, barWin.vol + step))
                     }
                 }
             }

@@ -18,7 +18,7 @@ hl.config({
         },
         shadow = { enabled = false },
     },
-    animations = { enabled = false },
+    animations = { enabled = true },
     misc = { disable_hyprland_logo = true },
 })
 

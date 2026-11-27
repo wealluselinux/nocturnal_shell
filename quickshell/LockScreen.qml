@@ -154,7 +154,7 @@ Scope {
 
                         Text {
                             anchors.horizontalCenter: parent.horizontalCenter
-                            text: Qt.formatDateTime(clock.date, "h:mm AP")
+                            text: Qt.formatDateTime(clock.date, Theme.use24h ? "HH:mm" : "h:mm AP")
                             color: "#e6e1ff"
                             font.family: "JetBrainsMono Nerd Font"
                             font.pixelSize: 36

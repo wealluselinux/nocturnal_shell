@@ -14,7 +14,8 @@ Scope {
         { name: "Midnight",  bg: "#0e1420", accent: "#89dceb" },
         { name: "Forest",    bg: "#101714", accent: "#a6e3a1" },
         { name: "Ember",     bg: "#1a1214", accent: "#fab387" },
-        { name: "Crimson",   bg: "#191116", accent: "#f38ba8" }
+        { name: "Crimson",   bg: "#191116", accent: "#f38ba8" },
+        { name: "Cyberpunk", bg: "#0a0b10", accent: "#00f0ff" }
     ]
 
     IpcHandler {
@@ -91,7 +92,7 @@ Scope {
         exclusionMode: ExclusionMode.Ignore
 
         implicitWidth: 660
-        implicitHeight: 540
+        implicitHeight: 580
         color: "transparent"
 
         onVisibleChanged: {
@@ -224,6 +225,32 @@ Scope {
                                         Text { anchors.centerIn: parent; text: modelData.label; color: "#e6e1ff"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 }
                                         MouseArea { anchors.fill: parent; onClicked: { Theme.panelOpacity = modelData.val; Theme.save() } }
                                     }
+                                }
+                            }
+                        }
+
+                        // 24h Clock + Earbang Volume Limit
+                        Row {
+                            width: parent.width
+                            spacing: 8
+
+                            Rectangle {
+                                width: 116; height: 32; radius: 8
+                                color: Theme.use24h ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.22) : "#1affffff"
+                                border.width: Theme.use24h ? 1 : 0; border.color: Theme.accent
+                                Text { anchors.centerIn: parent; text: Theme.use24h ? "Clock: 24h" : "Clock: 12h"; color: "#e6e1ff"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 }
+                                MouseArea { anchors.fill: parent; onClicked: { Theme.use24h = !Theme.use24h; Theme.save() } }
+                            }
+
+                            Repeater {
+                                model: [75, 85, 100]
+                                Rectangle {
+                                    required property int modelData
+                                    width: 68; height: 32; radius: 8
+                                    color: Theme.volumeLimit === modelData ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.22) : "#1affffff"
+                                    border.width: Theme.volumeLimit === modelData ? 1 : 0; border.color: Theme.accent
+                                    Text { anchors.centerIn: parent; text: "Max " + modelData + "%"; color: "#e6e1ff"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 }
+                                    MouseArea { anchors.fill: parent; onClicked: { Theme.volumeLimit = modelData; Theme.save() } }
                                 }
                             }
                         }
@@ -406,28 +433,44 @@ Scope {
                                 }
 
                                 Rectangle {
-                                    width: 160
-                                    height: 36
-                                    radius: 8
+                                    width: 140; height: 36; radius: 8
+                                    color: Theme.dockAutoHide ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.22) : "#1affffff"
+                                    border.width: Theme.dockAutoHide ? 1 : 0; border.color: Theme.accent
+                                    Text { anchors.centerIn: parent; text: Theme.dockAutoHide ? "Auto-Hide: ON" : "Auto-Hide: OFF"; color: "#e6e1ff"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 }
+                                    MouseArea { anchors.fill: parent; onClicked: { Theme.dockAutoHide = !Theme.dockAutoHide; Theme.save() } }
+                                }
+
+                                Rectangle {
+                                    width: 130; height: 36; radius: 8
                                     color: Theme.widgetsEnabled ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.22) : "#1affffff"
-                                    border.width: Theme.widgetsEnabled ? 1 : 0
-                                    border.color: Theme.accent
+                                    border.width: Theme.widgetsEnabled ? 1 : 0; border.color: Theme.accent
+                                    Text { anchors.centerIn: parent; text: Theme.widgetsEnabled ? "Widgets: ON" : "Widgets: OFF"; color: "#e6e1ff"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 }
+                                    MouseArea { anchors.fill: parent; onClicked: { Theme.widgetsEnabled = !Theme.widgetsEnabled; Theme.save() } }
+                                }
+                            }
 
-                                    Text {
-                                        anchors.centerIn: parent
-                                        text: Theme.widgetsEnabled ? "Widgets: ON" : "Widgets: OFF"
-                                        color: "#e6e1ff"
-                                        font.family: "JetBrainsMono Nerd Font"
-                                        font.pixelSize: 12
+                            Row {
+                                spacing: 6
+                                Repeater {
+                                    model: [
+                                        { label: "Clock",  key: "widgetClock"  },
+                                        { label: "Analog", key: "widgetAnalog" },
+                                        { label: "Music",  key: "widgetMusic"  },
+                                        { label: "Sound",  key: "widgetSound"  }
+                                    ]
+                                    Rectangle {
+                                        required property var modelData
+                                        width: 78; height: 30; radius: 8
+                                        color: Theme[modelData.key] ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.22) : "#1affffff"
+                                        border.width: Theme[modelData.key] ? 1 : 0; border.color: Theme.accent
+                                        Text { anchors.centerIn: parent; text: modelData.label; color: "#e6e1ff"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 }
+                                        MouseArea { anchors.fill: parent; onClicked: { Theme[modelData.key] = !Theme[modelData.key]; Theme.save() } }
                                     }
-
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        onClicked: {
-                                            Theme.widgetsEnabled = !Theme.widgetsEnabled
-                                            Theme.save()
-                                        }
-                                    }
+                                }
+                                Rectangle {
+                                    width: 76; height: 30; radius: 8; color: "#1affffff"
+                                    Text { anchors.centerIn: parent; text: "Reset"; color: Theme.accent; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 }
+                                    MouseArea { anchors.fill: parent; onClicked: Quickshell.execDetached(["quickshell", "ipc", "-p", root.homeDir + "/nocturnal/quickshell/shell.qml", "call", "widgets", "reset"]) }
                                 }
                             }
                         }
