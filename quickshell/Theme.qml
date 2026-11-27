@@ -29,6 +29,7 @@ Singleton {
     property bool widgetSound: true
     property bool dockAutoHide: false
     property bool cavaEnabled: false
+    property bool fastfetchLogo: false
     property bool use24h: false
     property int volumeLimit: 100
     property string barPosition: "top"
@@ -61,6 +62,7 @@ Singleton {
                 if (data.widgetSound !== undefined) theme.widgetSound = data.widgetSound
                 if (data.dockAutoHide !== undefined) theme.dockAutoHide = data.dockAutoHide
                 if (data.cavaEnabled !== undefined) theme.cavaEnabled = data.cavaEnabled
+                if (data.fastfetchLogo !== undefined) theme.fastfetchLogo = data.fastfetchLogo
                 if (data.use24h !== undefined) theme.use24h = data.use24h
                 if (data.volumeLimit !== undefined) theme.volumeLimit = data.volumeLimit
                 if (data.barPosition) theme.barPosition = data.barPosition
@@ -87,8 +89,10 @@ Singleton {
     }
 
     function syncApps() {
-        Quickshell.execDetached([Quickshell.env("HOME") + "/nocturnal/bin/sync-kitty", theme.accent.toString(), theme.lightMode ? "light" : "dark"])
+        var m = theme.lightMode ? "light" : "dark"
+        Quickshell.execDetached([Quickshell.env("HOME") + "/nocturnal/bin/sync-kitty", theme.accent.toString(), m])
         Quickshell.execDetached([Quickshell.env("HOME") + "/nocturnal/bin/sync-dolphin", theme.accent.toString()])
+        Quickshell.execDetached([Quickshell.env("HOME") + "/nocturnal/bin/sync-fastfetch", theme.fastfetchLogo ? "on" : "off", m])
     }
 
     function save() {
@@ -109,6 +113,7 @@ Singleton {
             widgetSound: theme.widgetSound,
             dockAutoHide: theme.dockAutoHide,
             cavaEnabled: theme.cavaEnabled,
+            fastfetchLogo: theme.fastfetchLogo,
             use24h: theme.use24h,
             volumeLimit: theme.volumeLimit,
             barPosition: theme.barPosition,

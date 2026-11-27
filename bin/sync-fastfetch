@@ -1,0 +1,53 @@
+#!/usr/bin/env python3
+import json, os, shutil, sys
+
+action = sys.argv[1] if len(sys.argv) > 1 else "on"
+mode = sys.argv[2] if len(sys.argv) > 2 else "dark"
+
+ff_dir = os.path.expanduser("~/.config/fastfetch")
+cfg = os.path.join(ff_dir, "config.jsonc")
+bak = os.path.join(ff_dir, "config.jsonc.nocturnal-bak")
+os.makedirs(ff_dir, exist_ok=True)
+
+moon_art = """        _..._
+      .:::::::.
+     :::::::::::   *
+     ::::::::::'
+      `:::::::'  .
+        `'''`
+"""
+
+sun_art = """      \\   |   /
+    '.  .---.  .'
+   --  (     )  --
+    .'  '---'  '.
+      /   |   \\
+"""
+
+moon_file = os.path.join(ff_dir, "nocturnal-logo.txt")
+sun_file = os.path.join(ff_dir, "daylight-logo.txt")
+open(moon_file, "w").write(moon_art)
+open(sun_file, "w").write(sun_art)
+
+if action == "off":
+    if os.path.exists(bak):
+        shutil.copy2(bak, cfg)
+    sys.exit(0)
+
+if os.path.exists(cfg) and not os.path.exists(bak):
+    shutil.copy2(cfg, bak)
+
+data = {}
+if os.path.exists(cfg):
+    try:
+        lines = [l for l in open(cfg).read().splitlines() if not l.lstrip().startswith("//")]
+        data = json.loads("\n".join(lines))
+    except Exception:
+        data = {}
+
+data["logo"] = {
+    "type": "file",
+    "source": sun_file if mode == "light" else moon_file,
+    "padding": {"top": 1, "left": 2, "right": 3}
+}
+open(cfg, "w").write(json.dumps(data, indent=2))
