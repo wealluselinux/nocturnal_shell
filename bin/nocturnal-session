@@ -1,6 +1,13 @@
 #!/bin/sh
-export QT_QPA_PLATFORMTHEME=kde
 export XDG_CURRENT_DESKTOP=Hyprland
 export XDG_SESSION_TYPE=wayland
 export XDG_SESSION_DESKTOP=nocturnal
-exec /usr/libexec/hyprland-dbus-run-session-if-needed /usr/bin/start-hyprland -- -c "$HOME/nocturnal/hypr/hyprland.lua"
+export QT_QPA_PLATFORMTHEME=kde
+
+if [ -x /usr/libexec/hyprland-dbus-run-session-if-needed ] && command -v start-hyprland >/dev/null 2>&1; then
+    exec /usr/libexec/hyprland-dbus-run-session-if-needed /usr/bin/start-hyprland -- -c "$HOME/nocturnal/hypr/hyprland.lua"
+elif command -v start-hyprland >/dev/null 2>&1; then
+    exec dbus-run-session start-hyprland -- -c "$HOME/nocturnal/hypr/hyprland.lua"
+else
+    exec dbus-run-session Hyprland -c "$HOME/nocturnal/hypr/hyprland.lua"
+fi
