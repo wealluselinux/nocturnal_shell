@@ -12,7 +12,8 @@ Scope {
     property string osPretty: "Linux"
     property string userHost: Quickshell.env("USER") || "rig"
     property string uptimeStr: "up 0m"
-    property string localVer: "1.2.1"
+    property string localVer: "1.2.2"
+    readonly property string codename: "Crescent"
     property string remoteVer: ""
     property string updateMsg: ""
 
@@ -39,12 +40,11 @@ Scope {
 
     ColorQuantizer {
         id: quantizer
-        depth: 3
+        depth: ColorQuantizer.Medium
         rescaleSize: 64
         onColorsChanged: {
             if (!colors || colors.length === 0) return
-            var best = colors[0]
-            var bestScore = -1
+            var best = colors[0], bestScore = -1
             for (var i = 0; i < colors.length; i++) {
                 var c = colors[i]
                 var score = c.hslSaturation * (1 - Math.abs(c.hslLightness - 0.55))
@@ -68,7 +68,7 @@ Scope {
 
     Process {
         id: verProc
-        command: ["sh", "-c", "cat \"$HOME/nocturnal/VERSION\" 2>/dev/null || echo 1.2.1"]
+        command: ["sh", "-c", "cat \"$HOME/nocturnal/VERSION\" 2>/dev/null || echo 1.2.2"]
         stdout: StdioCollector { id: vCol; onStreamFinished: { var v = vCol.text.trim(); if (v) root.localVer = v } }
     }
 
@@ -122,7 +122,7 @@ Scope {
 
     PanelWindow {
         id: win
-        visible: root.open || card.opacity > 0.01
+        visible: root.open
         focusable: true
         exclusionMode: ExclusionMode.Ignore
 
@@ -143,12 +143,12 @@ Scope {
             opacity: root.open ? 1 : 0
             scale: root.open ? 1.0 : 0.94
             Behavior on opacity { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
-            Behavior on scale { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }
+            Behavior on scale { NumberAnimation { duration: 220; easing.type: Easing.OutBack } }
 
             Row {
                 anchors.fill: parent
 
-                // LEFT ICON RAIL (image_e9251b.png style)
+                // LEFT ICON RAIL
                 Rectangle {
                     width: 56
                     height: parent.height
@@ -229,7 +229,7 @@ Scope {
                         width: parent.width - 36
                         height: parent.height - 68
 
-                        // TAB 0: HOME (image_e9251b.png inspired)
+                        // TAB 0: HOME
                         Column {
                             visible: root.activeTab === "home"
                             anchors.fill: parent
@@ -269,7 +269,7 @@ Scope {
                                         anchors.verticalCenter: parent.verticalCenter
                                         spacing: 4
                                         Text { text: root.userHost.toUpperCase(); color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 18; font.bold: true }
-                                        Text { text: (Theme.lightMode ? "Daylight Shell" : "Nocturnal Shell") + " v" + root.localVer; color: Theme.accent; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 12; font.bold: true }
+                                        Text { text: (Theme.lightMode ? "Daylight Shell" : "Nocturnal Shell") + " v" + root.localVer + " (" + root.codename + ")"; color: Theme.accent; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 12; font.bold: true }
                                         Text { text: "Uptime - " + root.uptimeStr; color: Theme.textMuted; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 }
                                     }
                                 }
@@ -504,16 +504,83 @@ Scope {
                             Row {
                                 spacing: 14
                                 MoonLogo { width: 52; height: 52; anchors.verticalCenter: parent.verticalCenter }
-                                Text { text: Theme.lightMode ? "Daylight Shell" : "Nocturnal Shell"; color: Theme.accent; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 22; font.bold: true; anchors.verticalCenter: parent.verticalCenter }
+                                Column {
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    spacing: 2
+                                    Text { text: Theme.lightMode ? "Daylight Shell" : "Nocturnal Shell"; color: Theme.accent; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 22; font.bold: true }
+                                    Text { text: "Made by rig • Built off Hyprland"; color: Theme.textMuted; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 12 }
+                                }
                             }
-                            Text { text: "Made by rig\nBuilt off Hyprland"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 14; lineHeight: 1.5 }
+
+                            Rectangle {
+                                width: parent.width
+                                height: 74
+                                radius: 12
+                                color: Theme.surface
+                                border.width: 1
+                                border.color: Theme.accent
+
+                                Row {
+                                    anchors.fill: parent
+                                    anchors.margins: 14
+                                    spacing: 14
+
+                                    Rectangle {
+                                        width: 44; height: 44; radius: 10
+                                        color: Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.2)
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        Text {
+                                            anchors.centerIn: parent
+                                            text: Theme.lightMode ? "\uf185" : "\uf186"
+                                            color: Theme.accent
+                                            font.family: "JetBrainsMono Nerd Font"
+                                            font.pixelSize: 20
+                                        }
+                                    }
+
+                                    Column {
+                                        width: parent.width - 170
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        spacing: 3
+                                        Text {
+                                            text: "Version v" + root.localVer
+                                            color: Theme.text
+                                            font.family: "JetBrainsMono Nerd Font"
+                                            font.pixelSize: 15
+                                            font.bold: true
+                                        }
+                                        Text {
+                                            text: "Codename: \"" + root.codename + "\""
+                                            color: Theme.accent
+                                            font.family: "JetBrainsMono Nerd Font"
+                                            font.pixelSize: 12
+                                            font.bold: true
+                                        }
+                                    }
+
+                                    Rectangle {
+                                        width: 96; height: 28; radius: 14
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        color: Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.18)
+                                        border.width: 1; border.color: Theme.accent
+                                        Text {
+                                            anchors.centerIn: parent
+                                            text: Theme.lightMode ? "Daylight" : "Nocturnal"
+                                            color: Theme.accent
+                                            font.family: "JetBrainsMono Nerd Font"
+                                            font.pixelSize: 11
+                                            font.bold: true
+                                        }
+                                    }
+                                }
+                            }
+
                             Rectangle { width: parent.width; height: 1; color: Theme.border }
                             Column {
                                 spacing: 6
                                 Text { text: "Compositor: Hyprland (Lua)"; color: Theme.textMuted; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 13 }
                                 Text { text: "Shell UI:   Quickshell (QML)"; color: Theme.textMuted; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 13 }
                                 Text { text: "OS:         " + root.osPretty; color: Theme.textMuted; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 13 }
-                                Text { text: "Version:    v" + root.localVer; color: Theme.accent; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 13; font.bold: true }
                             }
                             Row {
                                 spacing: 10

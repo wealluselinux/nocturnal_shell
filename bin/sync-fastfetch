@@ -1,33 +1,21 @@
 #!/usr/bin/env python3
-import json, os, shutil, sys
+import json
+import os
+import shutil
+import sys
 
 action = sys.argv[1] if len(sys.argv) > 1 else "on"
 mode = sys.argv[2] if len(sys.argv) > 2 else "dark"
+
+repo_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+assets_dir = os.path.join(repo_root, "assets")
+moon_file = os.path.join(assets_dir, "moon.txt")
+sun_file = os.path.join(assets_dir, "sun.txt")
 
 ff_dir = os.path.expanduser("~/.config/fastfetch")
 cfg = os.path.join(ff_dir, "config.jsonc")
 bak = os.path.join(ff_dir, "config.jsonc.nocturnal-bak")
 os.makedirs(ff_dir, exist_ok=True)
-
-moon_art = """        _..._
-      .:::::::.
-     :::::::::::   *
-     ::::::::::'
-      `:::::::'  .
-        `'''`
-"""
-
-sun_art = """      \\   |   /
-    '.  .---.  .'
-   --  (     )  --
-    .'  '---'  '.
-      /   |   \\
-"""
-
-moon_file = os.path.join(ff_dir, "nocturnal-logo.txt")
-sun_file = os.path.join(ff_dir, "daylight-logo.txt")
-open(moon_file, "w").write(moon_art)
-open(sun_file, "w").write(sun_art)
 
 if action == "off":
     if os.path.exists(bak):
@@ -40,7 +28,8 @@ if os.path.exists(cfg) and not os.path.exists(bak):
 data = {}
 if os.path.exists(cfg):
     try:
-        lines = [l for l in open(cfg).read().splitlines() if not l.lstrip().startswith("//")]
+        with open(cfg, "r", encoding="utf-8") as f:
+            lines = [l for l in f.read().splitlines() if not l.lstrip().startswith("//")]
         data = json.loads("\n".join(lines))
     except Exception:
         data = {}
@@ -50,4 +39,6 @@ data["logo"] = {
     "source": sun_file if mode == "light" else moon_file,
     "padding": {"top": 1, "left": 2, "right": 3}
 }
-open(cfg, "w").write(json.dumps(data, indent=2))
+
+with open(cfg, "w", encoding="utf-8") as f:
+    f.write(json.dumps(data, indent=2))
