@@ -2,17 +2,18 @@ import Quickshell
 
 ShellRoot {
     Bar {}
-    Widgets {}
     Dock {}
     Launcher {}
+    Widgets {}
     Settings {}
     Notifications {}
     RightSidebar {}
-    EmojiPicker {}
     Clipboard {}
+    EmojiPicker {}
     AiPanel {}
     SplashScreen {}
     LockScreen {}
     CavaBar {}
     Updater {}
+    WeatherEffects {}
 }

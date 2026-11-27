@@ -12,7 +12,7 @@ Scope {
     property string osPretty: "Linux"
     property string userHost: Quickshell.env("USER") || "rig"
     property string uptimeStr: "up 0m"
-    property string localVer: "1.2.2"
+    property string localVer: "1.2.3"
     readonly property string codename: "Crescent"
     property string remoteVer: ""
     property string updateMsg: ""
@@ -68,7 +68,7 @@ Scope {
 
     Process {
         id: verProc
-        command: ["sh", "-c", "cat \"$HOME/nocturnal/VERSION\" 2>/dev/null || echo 1.2.2"]
+        command: ["sh", "-c", "cat \"$HOME/nocturnal/VERSION\" 2>/dev/null || echo 1.2.3"]
         stdout: StdioCollector { id: vCol; onStreamFinished: { var v = vCol.text.trim(); if (v) root.localVer = v } }
     }
 
@@ -325,7 +325,7 @@ Scope {
                                     }
                                 }
 
-                                // Right 2x3 Quick Toggles
+                                // Right 2x4 Quick Toggles
                                 Grid {
                                     width: parent.width * 0.52 - 12
                                     height: parent.height
@@ -333,10 +333,10 @@ Scope {
                                     spacing: 8
 
                                     Rectangle {
-                                        width: (parent.width - 8) / 2; height: (parent.height - 16) / 3; radius: 12
+                                        width: (parent.width - 8) / 2; height: (parent.height - 24) / 4; radius: 12
                                         color: Theme.lightMode ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.25) : Theme.surface
                                         border.width: 1; border.color: Theme.accent
-                                        Column { anchors.centerIn: parent; spacing: 4; Text { anchors.horizontalCenter: parent.horizontalCenter; text: Theme.lightMode ? "\uf185" : "\uf186"; color: Theme.accent; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 18 } Text { anchors.horizontalCenter: parent.horizontalCenter; text: Theme.lightMode ? "Daylight" : "Nocturnal"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 } }
+                                        Column { anchors.centerIn: parent; spacing: 2; Text { anchors.horizontalCenter: parent.horizontalCenter; text: Theme.lightMode ? "\uf185" : "\uf186"; color: Theme.accent; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 16 } Text { anchors.horizontalCenter: parent.horizontalCenter; text: Theme.lightMode ? "Daylight" : "Nocturnal"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 } }
                                         MouseArea {
                                             anchors.fill: parent
                                             onClicked: {
@@ -352,43 +352,59 @@ Scope {
                                     }
 
                                     Rectangle {
-                                        width: (parent.width - 8) / 2; height: (parent.height - 16) / 3; radius: 12
+                                        width: (parent.width - 8) / 2; height: (parent.height - 24) / 4; radius: 12
+                                        color: Theme.liquidGlass ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.25) : Theme.surface
+                                        border.width: Theme.liquidGlass ? 1 : 0; border.color: Theme.accent
+                                        Column { anchors.centerIn: parent; spacing: 2; Text { anchors.horizontalCenter: parent.horizontalCenter; text: "\uf043"; color: Theme.liquidGlass ? Theme.accent : Theme.textMuted; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 16 } Text { anchors.horizontalCenter: parent.horizontalCenter; text: "Liquid Glass"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 } }
+                                        MouseArea { anchors.fill: parent; onClicked: { Theme.liquidGlass = !Theme.liquidGlass; Theme.save() } }
+                                    }
+
+                                    Rectangle {
+                                        width: (parent.width - 8) / 2; height: (parent.height - 24) / 4; radius: 12
+                                        color: Theme.weatherEffects ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.25) : Theme.surface
+                                        border.width: Theme.weatherEffects ? 1 : 0; border.color: Theme.accent
+                                        Column { anchors.centerIn: parent; spacing: 2; Text { anchors.horizontalCenter: parent.horizontalCenter; text: "\uf0c2"; color: Theme.weatherEffects ? Theme.accent : Theme.textMuted; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 16 } Text { anchors.horizontalCenter: parent.horizontalCenter; text: "Weather FX"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 } }
+                                        MouseArea { anchors.fill: parent; onClicked: { Theme.weatherEffects = !Theme.weatherEffects; Theme.save() } }
+                                    }
+
+                                    Rectangle {
+                                        width: (parent.width - 8) / 2; height: (parent.height - 24) / 4; radius: 12
                                         color: Theme.fastfetchLogo ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.25) : Theme.surface
                                         border.width: Theme.fastfetchLogo ? 1 : 0; border.color: Theme.accent
-                                        Column { anchors.centerIn: parent; spacing: 4; Text { anchors.horizontalCenter: parent.horizontalCenter; text: "\uf120"; color: Theme.fastfetchLogo ? Theme.accent : Theme.textMuted; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 18 } Text { anchors.horizontalCenter: parent.horizontalCenter; text: "Fastfetch"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 } }
+                                        Column { anchors.centerIn: parent; spacing: 2; Text { anchors.horizontalCenter: parent.horizontalCenter; text: "\uf120"; color: Theme.fastfetchLogo ? Theme.accent : Theme.textMuted; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 16 } Text { anchors.horizontalCenter: parent.horizontalCenter; text: "Fastfetch"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 } }
                                         MouseArea { anchors.fill: parent; onClicked: { Theme.fastfetchLogo = !Theme.fastfetchLogo; Theme.save() } }
                                     }
 
                                     Rectangle {
-                                        width: (parent.width - 8) / 2; height: (parent.height - 16) / 3; radius: 12
+                                        width: (parent.width - 8) / 2; height: (parent.height - 24) / 4; radius: 12
                                         color: Theme.dockEnabled ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.25) : Theme.surface
                                         border.width: Theme.dockEnabled ? 1 : 0; border.color: Theme.accent
-                                        Column { anchors.centerIn: parent; spacing: 4; Text { anchors.horizontalCenter: parent.horizontalCenter; text: "\uf0c9"; color: Theme.dockEnabled ? Theme.accent : Theme.textMuted; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 18 } Text { anchors.horizontalCenter: parent.horizontalCenter; text: "Dock"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 } }
+                                        Column { anchors.centerIn: parent; spacing: 2; Text { anchors.horizontalCenter: parent.horizontalCenter; text: "\uf0c9"; color: Theme.dockEnabled ? Theme.accent : Theme.textMuted; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 16 } Text { anchors.horizontalCenter: parent.horizontalCenter; text: "Dock"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 } }
                                         MouseArea { anchors.fill: parent; onClicked: { Theme.dockEnabled = !Theme.dockEnabled; Theme.save() } }
                                     }
 
                                     Rectangle {
-                                        width: (parent.width - 8) / 2; height: (parent.height - 16) / 3; radius: 12
+                                        width: (parent.width - 8) / 2; height: (parent.height - 24) / 4; radius: 12
                                         color: Theme.widgetsEnabled ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.25) : Theme.surface
                                         border.width: Theme.widgetsEnabled ? 1 : 0; border.color: Theme.accent
-                                        Column { anchors.centerIn: parent; spacing: 4; Text { anchors.horizontalCenter: parent.horizontalCenter; text: "\uf009"; color: Theme.widgetsEnabled ? Theme.accent : Theme.textMuted; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 18 } Text { anchors.horizontalCenter: parent.horizontalCenter; text: "Widgets"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 } }
+                                        Column { anchors.centerIn: parent; spacing: 2; Text { anchors.horizontalCenter: parent.horizontalCenter; text: "\uf009"; color: Theme.widgetsEnabled ? Theme.accent : Theme.textMuted; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 16 } Text { anchors.horizontalCenter: parent.horizontalCenter; text: "Widgets"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 } }
                                         MouseArea { anchors.fill: parent; onClicked: { Theme.widgetsEnabled = !Theme.widgetsEnabled; Theme.save() } }
                                     }
 
                                     Rectangle {
-                                        width: (parent.width - 8) / 2; height: (parent.height - 16) / 3; radius: 12
+                                        width: (parent.width - 8) / 2; height: (parent.height - 24) / 4; radius: 12
                                         color: Theme.cavaEnabled ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.25) : Theme.surface
                                         border.width: Theme.cavaEnabled ? 1 : 0; border.color: Theme.accent
-                                        Column { anchors.centerIn: parent; spacing: 4; Text { anchors.horizontalCenter: parent.horizontalCenter; text: "\uf001"; color: Theme.cavaEnabled ? Theme.accent : Theme.textMuted; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 18 } Text { anchors.horizontalCenter: parent.horizontalCenter; text: "Cava"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 } }
+                                        Column { anchors.centerIn: parent; spacing: 2; Text { anchors.horizontalCenter: parent.horizontalCenter; text: "\uf001"; color: Theme.cavaEnabled ? Theme.accent : Theme.textMuted; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 16 } Text { anchors.horizontalCenter: parent.horizontalCenter; text: "Cava"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 } }
                                         MouseArea { anchors.fill: parent; onClicked: { Theme.cavaEnabled = !Theme.cavaEnabled; Theme.save() } }
                                     }
 
                                     Rectangle {
-                                        width: (parent.width - 8) / 2; height: (parent.height - 16) / 3; radius: 12
+                                        width: (parent.width - 8) / 2; height: (parent.height - 24) / 4; radius: 12
                                         color: Theme.blurEnabled ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.25) : Theme.surface
                                         border.width: Theme.blurEnabled ? 1 : 0; border.color: Theme.accent
-                                        Column { anchors.centerIn: parent; spacing: 4; Text { anchors.horizontalCenter: parent.horizontalCenter; text: "\uf0d0"; color: Theme.blurEnabled ? Theme.accent : Theme.textMuted; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 18 } Text { anchors.horizontalCenter: parent.horizontalCenter; text: "Blur"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 } }
-                                        MouseArea { anchors.fill: parent; onClicked: { Theme.blurEnabled = !Theme.blurEnabled; Theme.save(); Quickshell.execDetached(["hyprctl", "keyword", "decoration:blur:enabled", Theme.blurEnabled ? "true" : "false"]) } }
+                                        Column { anchors.centerIn: parent; spacing: 2; Text { anchors.horizontalCenter: parent.horizontalCenter; text: "\uf0d0"; color: Theme.blurEnabled ? Theme.accent : Theme.textMuted; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 16 } Text { anchors.horizontalCenter: parent.horizontalCenter; text: "Blur"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 } }
+                                        MouseArea { anchors.fill: parent; onClicked: { Theme.blurEnabled = !Theme.blurEnabled; Theme.save() } }
                                     }
                                 }
                             }
@@ -415,12 +431,26 @@ Scope {
                                 }
                             }
 
-                            Text { text: "TRANSPARENCY & SHAPE"; color: Theme.accent; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11; font.bold: true }
+                            Text { text: "TRANSPARENCY, GLASS & WEATHER"; color: Theme.accent; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11; font.bold: true }
                             Row {
                                 spacing: 8
                                 Repeater {
                                     model: [{ label: "50%", val: 0.50 }, { label: "70%", val: 0.70 }, { label: "85%", val: 0.85 }, { label: "100%", val: 1.00 }]
                                     Rectangle { required property var modelData; width: 68; height: 30; radius: 8; color: Math.abs(Theme.panelOpacity - modelData.val) < 0.05 ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.22) : Theme.surface; border.width: Math.abs(Theme.panelOpacity - modelData.val) < 0.05 ? 1 : 0; border.color: Theme.accent; Text { anchors.centerIn: parent; text: modelData.label; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 } MouseArea { anchors.fill: parent; onClicked: { Theme.panelOpacity = modelData.val; Theme.save() } } }
+                                }
+                                Rectangle {
+                                    width: 124; height: 30; radius: 8
+                                    color: Theme.liquidGlass ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.22) : Theme.surface
+                                    border.width: Theme.liquidGlass ? 1 : 0; border.color: Theme.accent
+                                    Text { anchors.centerIn: parent; text: Theme.liquidGlass ? "Liquid Glass: ON" : "Liquid Glass"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 }
+                                    MouseArea { anchors.fill: parent; onClicked: { Theme.liquidGlass = !Theme.liquidGlass; Theme.save() } }
+                                }
+                                Rectangle {
+                                    width: 116; height: 30; radius: 8
+                                    color: Theme.weatherEffects ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.22) : Theme.surface
+                                    border.width: Theme.weatherEffects ? 1 : 0; border.color: Theme.accent
+                                    Text { anchors.centerIn: parent; text: Theme.weatherEffects ? "Weather FX: ON" : "Weather FX"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 }
+                                    MouseArea { anchors.fill: parent; onClicked: { Theme.weatherEffects = !Theme.weatherEffects; Theme.save() } }
                                 }
                             }
                             Row {

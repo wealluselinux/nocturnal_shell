@@ -6,15 +6,24 @@ import QtQuick
 Singleton {
     id: theme
     property bool lightMode: false
+    property bool liquidGlass: false
+    property bool weatherEffects: false
     property color accent: "#c9b8ff"
     property color bg: lightMode ? "#f3f1fa" : "#12131a"
     property real panelOpacity: 0.85
     property int shapeRadius: 12
-    readonly property color panelBg: Qt.rgba(bg.r, bg.g, bg.b, panelOpacity)
+    readonly property real effectiveOpacity: liquidGlass ? Math.min(panelOpacity, lightMode ? 0.42 : 0.32) : panelOpacity
+    readonly property color panelBg: liquidGlass
+        ? Qt.rgba(lightMode ? 0.96 : 0.14, lightMode ? 0.96 : 0.16, lightMode ? 1.0 : 0.24, effectiveOpacity)
+        : Qt.rgba(bg.r, bg.g, bg.b, panelOpacity)
     readonly property color text: lightMode ? "#181924" : "#e6e1ff"
     readonly property color textMuted: lightMode ? "#5c5a72" : "#b8b3d6"
-    readonly property color surface: lightMode ? "#14000000" : "#14ffffff"
-    readonly property color border: lightMode ? "#24000000" : "#22ffffff"
+    readonly property color surface: liquidGlass
+        ? (lightMode ? "#38ffffff" : "#26ffffff")
+        : (lightMode ? "#14000000" : "#14ffffff")
+    readonly property color border: liquidGlass
+        ? (lightMode ? "#78ffffff" : "#4dffffff")
+        : (lightMode ? "#24000000" : "#22ffffff")
     readonly property color splashBg: lightMode ? "#f3f1fa" : "#08090e"
 
     property string themePreset: "Nocturnal"
@@ -35,8 +44,8 @@ Singleton {
     property string barPosition: "top"
     property string dockPosition: "middle"
     property string launcherPosition: "middle"
-    property var pinnedIds: []
     property var rightPillOrder: ["wifi", "stats", "battery", "volume"]
+    property var pinnedIds: []
 
     FileView {
         id: settingsFile
@@ -47,6 +56,8 @@ Singleton {
             try {
                 var data = JSON.parse(text())
                 if (data.lightMode !== undefined) theme.lightMode = data.lightMode
+                if (data.liquidGlass !== undefined) theme.liquidGlass = data.liquidGlass
+                if (data.weatherEffects !== undefined) theme.weatherEffects = data.weatherEffects
                 if (data.accent) theme.accent = data.accent
                 if (data.themePreset) theme.themePreset = data.themePreset
                 if (data.wallpaper) theme.wallpaper = data.wallpaper
@@ -93,11 +104,18 @@ Singleton {
         Quickshell.execDetached([Quickshell.env("HOME") + "/nocturnal/bin/sync-kitty", theme.accent.toString(), m])
         Quickshell.execDetached([Quickshell.env("HOME") + "/nocturnal/bin/sync-dolphin", theme.accent.toString()])
         Quickshell.execDetached([Quickshell.env("HOME") + "/nocturnal/bin/sync-fastfetch", theme.fastfetchLogo ? "on" : "off", m])
+        if (theme.liquidGlass) {
+            Quickshell.execDetached(["hyprctl", "--batch", "keyword decoration:blur:enabled true; keyword decoration:blur:size 7; keyword decoration:blur:passes 3; keyword decoration:blur:xray false"])
+        } else {
+            Quickshell.execDetached(["hyprctl", "--batch", "keyword decoration:blur:enabled " + (theme.blurEnabled ? "true" : "false") + "; keyword decoration:blur:size 4; keyword decoration:blur:passes 2; keyword decoration:blur:xray true"])
+        }
     }
 
     function save() {
         settingsFile.setText(JSON.stringify({
             lightMode: theme.lightMode,
+            liquidGlass: theme.liquidGlass,
+            weatherEffects: theme.weatherEffects,
             accent: theme.accent.toString(),
             themePreset: theme.themePreset,
             wallpaper: theme.wallpaper,

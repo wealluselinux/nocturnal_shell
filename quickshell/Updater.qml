@@ -54,7 +54,14 @@ Scope {
     Process {
         id: updateProc
         command: ["sh", "-c",
-            "cd \"$HOME/nocturnal\" && git pull --rebase origin main && chmod +x bin/* && " +
+            "mkdir -p /tmp/nocturnal-userbak && " +
+            "for f in settings.json pinned.json widgets.json; do [ -f \"$HOME/nocturnal/quickshell/$f\" ] && cp \"$HOME/nocturnal/quickshell/$f\" \"/tmp/nocturnal-userbak/$f\"; done && " +
+            "cd \"$HOME/nocturnal\" && " +
+            "(git -c core.fileMode=false stash -q 2>/dev/null || true) && " +
+            "git -c core.fileMode=false pull --rebase origin main && " +
+            "for f in settings.json pinned.json widgets.json; do [ -f \"/tmp/nocturnal-userbak/$f\" ] && cp \"/tmp/nocturnal-userbak/$f\" \"$HOME/nocturnal/quickshell/$f\"; done && " +
+            "rm -rf /tmp/nocturnal-userbak && " +
+            "chmod +x bin/* && " +
             "cat VERSION > /tmp/nocturnal-updated && " +
             "nohup sh -c 'sleep 0.5; pkill quickshell; nohup quickshell -p \"$HOME/nocturnal/quickshell/shell.qml\" >/dev/null 2>&1 &' >/dev/null 2>&1 &"
         ]
@@ -93,7 +100,7 @@ Scope {
                     }
 
                     Text { anchors.horizontalCenter: parent.horizontalCenter; text: root.statusText; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 18; font.bold: true }
-                    Text { anchors.horizontalCenter: parent.horizontalCenter; text: "Do not turn off your computer"; color: Theme.textMuted; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 12 }
+                    Text { anchors.horizontalCenter: parent.horizontalCenter; text: "Preserving your settings & wallpaper..."; color: Theme.textMuted; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 12 }
                 }
             }
         }
