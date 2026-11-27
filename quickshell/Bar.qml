@@ -67,6 +67,7 @@ Variants {
             anchors.right: parent.right
 
             Weather {}
+            Volume {}
         }
     }
 }
