@@ -38,7 +38,7 @@ echo "What this installer will do:"
 echo "  1. Install dependencies (Hyprland, Quickshell, Kitty, swaybg, grim, slurp, wl-clipboard, cava, curl, python3, kdialog, notify-send)"
 echo "  2. Reset shell settings to clean Nocturnal defaults (default wall0.png wallpaper)"
 echo "  3. Set executable permissions on $DIR/bin/* and create ~/Pictures/{Wallpapers,Screenshots}"
-echo "  4. Install /usr/share/wayland-sessions/nocturnal.desktop (selectable at login)"
+echo "  4. Install /usr/local/bin/nocturnal-session and /usr/share/wayland-sessions/nocturnal.desktop (selectable at login)"
 echo ""
 printf "Are you ready for the installation? [y/N]: "
 read -r ans
@@ -61,9 +61,8 @@ case "$BASE" in
         ;;
     debian)
         sudo apt-get update
-        sudo apt-get install -y hyprland kitty swaybg grim slurp wl-clipboard cava curl python3 python3-pil kdialog libnotify-bin dbus-x11 || \
         sudo apt-get install -y kitty swaybg grim slurp wl-clipboard cava curl python3 python3-pil kdialog libnotify-bin dbus-x11
-        echo "Note: Make sure Hyprland (0.55+) and Quickshell are installed for your Debian/Ubuntu release."
+        echo "Note: Hyprland (0.55+) and Quickshell are not in Debian apt repos; install them via Nix or build from source."
         ;;
     fedora)
         sudo dnf install -y hyprland kitty swaybg grim slurp wl-clipboard cava curl python3 python3-pillow kdialog libnotify dbus-x11
@@ -87,10 +86,11 @@ cat > "$DIR/quickshell/settings.json" << 'JSON'
 JSON
 echo "[]" > "$DIR/quickshell/pinned.json"
 
-# 4. Permissions, folders, & Session entry
+# 4. Permissions, folders, & Session entry (installed to /usr/local/bin so GDM can execute it)
 chmod +x "$DIR/bin/"* 2>/dev/null || true
 mkdir -p "$HOME/Pictures/Wallpapers" "$HOME/Pictures/Screenshots"
-sed "s|/home/rig/nocturnal|$DIR|g" "$DIR/session/nocturnal.desktop" > /tmp/nocturnal.desktop
+sudo install -m 755 "$DIR/bin/nocturnal-session" /usr/local/bin/nocturnal-session
+sed "s|Exec=.*|Exec=/usr/local/bin/nocturnal-session|" "$DIR/session/nocturnal.desktop" > /tmp/nocturnal.desktop
 sudo install -m 644 /tmp/nocturnal.desktop /usr/share/wayland-sessions/nocturnal.desktop
 rm -f /tmp/nocturnal.desktop
 
