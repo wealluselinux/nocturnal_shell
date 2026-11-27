@@ -14,4 +14,5 @@ ShellRoot {
     SplashScreen {}
     LockScreen {}
     CavaBar {}
+    Updater {}
 }

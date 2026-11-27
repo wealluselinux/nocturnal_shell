@@ -35,7 +35,7 @@ Scope {
             screen: modelData
             visible: Theme.cavaEnabled
             exclusionMode: ExclusionMode.Ignore
-            WlrLayershell.layer: WlrLayer.Bottom
+            WlrLayershell.layer: WlrLayer.Overlay
             mask: Region {}
 
             anchors { bottom: true; left: true; right: true }
