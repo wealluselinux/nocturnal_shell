@@ -21,25 +21,13 @@ Variants {
             left: vertical ? (Theme.barPosition === "left") : true
             right: vertical ? (Theme.barPosition === "right") : true
         }
-        margins {
-            top: 8
-            bottom: 8
-            left: 8
-            right: 8
-        }
+        margins { top: 8; bottom: 8; left: 8; right: 8 }
         implicitWidth: vertical ? 44 : 100
         implicitHeight: vertical ? 100 : 36
         color: "transparent"
 
-        SystemClock {
-            id: clock
-            precision: SystemClock.Minutes
-        }
-
-        QuickSettings {
-            id: quickSettings
-            targetScreen: modelData
-        }
+        SystemClock { id: clock; precision: SystemClock.Minutes }
+        QuickSettings { id: quickSettings; targetScreen: modelData }
 
         property string wifi: "Off"
         property string cpu: "0%"
@@ -86,13 +74,7 @@ Variants {
             }
         }
 
-        Timer {
-            interval: 3000
-            running: true
-            repeat: true
-            triggeredOnStart: true
-            onTriggered: statsProc.running = true
-        }
+        Timer { interval: 3000; running: true; repeat: true; triggeredOnStart: true; onTriggered: statsProc.running = true }
 
         PwObjectTracker { objects: [Pipewire.defaultAudioSink] }
         readonly property var sink: Pipewire.defaultAudioSink
@@ -114,13 +96,7 @@ Variants {
                         implicitWidth: aiIcon.implicitWidth
                         implicitHeight: aiIcon.implicitHeight
                         anchors.verticalCenter: parent.verticalCenter
-                        Text {
-                            id: aiIcon
-                            text: "\uf0eb"
-                            color: Theme.accent
-                            font.family: "JetBrainsMono Nerd Font"
-                            font.pixelSize: 15
-                        }
+                        Text { id: aiIcon; text: "\uf0eb"; color: Theme.accent; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 15 }
                         MouseArea {
                             anchors.fill: parent
                             onClicked: Quickshell.execDetached(["quickshell", "ipc", "-p", Quickshell.env("HOME") + "/nocturnal/quickshell/shell.qml", "call", "ai", "toggle"])
@@ -130,7 +106,7 @@ Variants {
 
                 Pill {
                     Row {
-                        spacing: 4
+                        spacing: 2
                         anchors.verticalCenter: parent.verticalCenter
                         Repeater {
                             model: 10
@@ -149,7 +125,7 @@ Variants {
                                     return out
                                 }
 
-                                width: Math.max(24, wsInner.implicitWidth + 10)
+                                width: Math.max(20, wsInner.implicitWidth + 6)
                                 height: 24
                                 radius: 6
                                 color: isFocused ? Theme.accent : (wsApps.length > 0 ? "#24ffffff" : "#10ffffff")
@@ -159,17 +135,15 @@ Variants {
                                 Row {
                                     id: wsInner
                                     anchors.centerIn: parent
-                                    spacing: 4
-
+                                    spacing: 3
                                     Text {
                                         anchors.verticalCenter: parent.verticalCenter
                                         text: wsBtn.wsId
-                                        color: wsBtn.isFocused ? (Theme.lightMode ? "#ffffff" : "#12131a") : (wsBtn.wsApps.length > 0 ? Theme.text : Theme.text)
+                                        color: wsBtn.isFocused ? (Theme.lightMode ? "#ffffff" : "#12131a") : (wsBtn.wsApps.length > 0 ? Theme.text : Theme.textMuted)
                                         font.family: "JetBrainsMono Nerd Font"
                                         font.pixelSize: 11
                                         font.bold: wsBtn.isFocused
                                     }
-
                                     Repeater {
                                         model: wsBtn.wsApps
                                         IconImage {
@@ -231,7 +205,7 @@ Variants {
                         required property string modelData
                         required property int index
                         visible: modelData !== "battery" || barWin.bat !== ""
-                        border.color: dragArea.holding ? Theme.accent : "#22ffffff"
+                        border.color: dragArea.holding ? Theme.accent : Theme.border
                         border.width: dragArea.holding ? 2 : 1
 
                         Item {
@@ -247,9 +221,9 @@ Variants {
                                     return (barWin.muted ? "\uf026  " : "\uf028  ") + Math.round(barWin.vol * 100) + "%"
                                 }
                                 color: {
-                                    if (rPill.modelData === "wifi" && barWin.wifi === "Off") return Theme.text
+                                    if (rPill.modelData === "wifi" && barWin.wifi === "Off") return Theme.textMuted
                                     if (rPill.modelData === "battery" && barWin.charging) return Theme.accent
-                                    if (rPill.modelData === "volume" && barWin.muted) return Theme.text
+                                    if (rPill.modelData === "volume" && barWin.muted) return Theme.textMuted
                                     return Theme.text
                                 }
                                 font.family: "JetBrainsMono Nerd Font"
@@ -297,7 +271,6 @@ Variants {
             visible: barWin.vertical
             anchors.fill: parent
 
-            // Top: AI + Workspaces
             Column {
                 anchors.top: parent.top
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -305,7 +278,7 @@ Variants {
 
                 Rectangle {
                     width: 40; height: 40; radius: 10
-                    color: Theme.panelBg; border.width: 1; border.color: "#22ffffff"
+                    color: Theme.panelBg; border.width: 1; border.color: Theme.border
                     Text { anchors.centerIn: parent; text: "\uf0eb"; color: Theme.accent; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 16 }
                     MouseArea {
                         anchors.fill: parent
@@ -317,7 +290,7 @@ Variants {
                     width: 40
                     height: wsCol.implicitHeight + 16
                     radius: 10
-                    color: Theme.panelBg; border.width: 1; border.color: "#22ffffff"
+                    color: Theme.panelBg; border.width: 1; border.color: Theme.border
 
                     Column {
                         id: wsCol
@@ -326,90 +299,58 @@ Variants {
                         Repeater {
                             model: 10
                             Rectangle {
-                                required property var modelData
+                                required property int index
+                                readonly property bool isFocused: Hyprland.focusedWorkspace !== null && Hyprland.focusedWorkspace.id === (index + 1)
                                 width: 26; height: 26; radius: 6
-                                color: (Hyprland.focusedWorkspace && Hyprland.focusedWorkspace.id === index + 1) ? Theme.accent : "#1affffff"
+                                color: isFocused ? Theme.accent : Theme.surface
                                 Behavior on color { ColorAnimation { duration: 180 } }
                                 Text {
                                     anchors.centerIn: parent
                                     text: index + 1
-                                    color: (Hyprland.focusedWorkspace && Hyprland.focusedWorkspace.id === index + 1) ? (Theme.lightMode ? "#ffffff" : "#12131a") : Theme.text
+                                    color: isFocused ? (Theme.lightMode ? "#ffffff" : "#12131a") : Theme.text
                                     font.family: "JetBrainsMono Nerd Font"
                                     font.pixelSize: 12
-                                    font.bold: (Hyprland.focusedWorkspace && Hyprland.focusedWorkspace.id === index + 1)
+                                    font.bold: isFocused
                                 }
-                                MouseArea { anchors.fill: parent; onClicked: Quickshell.execDetached(["hyprctl", "dispatch", "hl.dsp.focus({ workspace = " + (index + 1) + " })"]) }
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: Quickshell.execDetached(["hyprctl", "dispatch", "hl.dsp.focus({ workspace = " + (index + 1) + " })"])
+                                }
                             }
                         }
                     }
                 }
             }
 
-            // Center: Stacked HH / mm clock (opens Dashboard)
             Rectangle {
                 anchors.centerIn: parent
                 width: 40; height: 64; radius: 10
-                color: Theme.panelBg; border.width: 1; border.color: "#22ffffff"
+                color: Theme.panelBg; border.width: 1; border.color: Theme.border
 
                 Column {
                     anchors.centerIn: parent
-                    Text {
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        text: Qt.formatDateTime(clock.date, "HH")
-                        color: Theme.text
-                        font.family: "JetBrainsMono Nerd Font"
-                        font.pixelSize: 15
-                        font.bold: true
-                    }
-                    Text {
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        text: Qt.formatDateTime(clock.date, "mm")
-                        color: Theme.accent
-                        font.family: "JetBrainsMono Nerd Font"
-                        font.pixelSize: 15
-                        font.bold: true
-                    }
+                    Text { anchors.horizontalCenter: parent.horizontalCenter; text: Qt.formatDateTime(clock.date, "HH"); color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 15; font.bold: true }
+                    Text { anchors.horizontalCenter: parent.horizontalCenter; text: Qt.formatDateTime(clock.date, "mm"); color: Theme.accent; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 15; font.bold: true }
                 }
                 MouseArea { anchors.fill: parent; onClicked: quickSettings.open = !quickSettings.open }
             }
 
-            // Bottom: Compact Wi-Fi, Battery, Volume (opens Right Sidebar)
             Rectangle {
                 anchors.bottom: parent.bottom
                 anchors.horizontalCenter: parent.horizontalCenter
                 width: 40
                 height: vStatCol.implicitHeight + 16
                 radius: 10
-                color: Theme.panelBg; border.width: 1; border.color: "#22ffffff"
+                color: Theme.panelBg; border.width: 1; border.color: Theme.border
 
                 Column {
                     id: vStatCol
                     anchors.centerIn: parent
                     spacing: 10
 
-                    Text {
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        text: "\uf1eb"
-                        color: barWin.wifi === "Off" ? Theme.text : Theme.text
-                        font.family: "JetBrainsMono Nerd Font"
-                        font.pixelSize: 14
-                    }
-                    Text {
-                        visible: barWin.bat !== ""
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        text: barWin.bat + "%"
-                        color: barWin.charging ? Theme.accent : Theme.text
-                        font.family: "JetBrainsMono Nerd Font"
-                        font.pixelSize: 10
-                        font.bold: true
-                    }
-                    Text {
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        text: barWin.muted ? "\uf026" : "\uf028"
-                        color: barWin.muted ? Theme.text : Theme.accent
-                        font.family: "JetBrainsMono Nerd Font"
-                        font.pixelSize: 14
-                    }
+                    Text { anchors.horizontalCenter: parent.horizontalCenter; text: "\uf1eb"; color: barWin.wifi === "Off" ? Theme.textMuted : Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 14 }
+                    Text { visible: barWin.bat !== ""; anchors.horizontalCenter: parent.horizontalCenter; text: barWin.bat + "%"; color: barWin.charging ? Theme.accent : Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 10; font.bold: true }
+                    Text { anchors.horizontalCenter: parent.horizontalCenter; text: barWin.muted ? "\uf026" : "\uf028"; color: barWin.muted ? Theme.textMuted : Theme.accent; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 14 }
                 }
 
                 MouseArea {

@@ -32,9 +32,7 @@ Item {
             syncedLines = []
             plainText = ""
             activeLineIdx = -1
-            if (showLyrics && player && player.trackTitle) {
-                fetchLyrics()
-            }
+            if (showLyrics && player && player.trackTitle) fetchLyrics()
         }
     }
 
@@ -53,10 +51,7 @@ Item {
     }
 
     function fetchLyrics() {
-        if (!player || !player.trackTitle) {
-            plainText = "No track playing."
-            return
-        }
+        if (!player || !player.trackTitle) { plainText = "No track playing."; return }
         plainText = "Loading lyrics..."
         syncedLines = []
         activeLineIdx = -1
@@ -109,7 +104,7 @@ Item {
         id: pill
 
         Row {
-            spacing: 8
+            spacing: 6
             anchors.verticalCenter: parent.verticalCenter
 
             Item {
@@ -119,13 +114,13 @@ Item {
 
                 Row {
                     id: infoRow
-                    spacing: 8
+                    spacing: 6
 
                     Rectangle {
-                        width: 22; height: 22; radius: 5; color: "#1affffff"; clip: true
+                        width: 22; height: 22; radius: 5; color: Theme.surface; clip: true
                         anchors.verticalCenter: parent.verticalCenter
                         Image { anchors.fill: parent; source: root.player && root.player.trackArtUrl ? root.player.trackArtUrl : ""; fillMode: Image.PreserveAspectCrop; visible: source !== "" }
-                        Text { anchors.centerIn: parent; text: "\uf001"; color: root.player && root.player.isPlaying ? Theme.accent : Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 12; visible: !root.player || !root.player.trackArtUrl }
+                        Text { anchors.centerIn: parent; text: "\uf001"; color: root.player && root.player.isPlaying ? Theme.accent : Theme.textMuted; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 12; visible: !root.player || !root.player.trackArtUrl }
                     }
 
                     Text {
@@ -134,7 +129,7 @@ Item {
                         font.family: "JetBrainsMono Nerd Font"
                         font.pixelSize: 13
                         elide: Text.ElideRight
-                        width: Math.min(implicitWidth, 145)
+                        width: Math.min(implicitWidth, 90)
                         anchors.verticalCenter: parent.verticalCenter
                     }
                 }
@@ -175,7 +170,7 @@ Item {
             radius: Theme.shapeRadius
             color: Theme.panelBg
             border.width: 1
-            border.color: "#22ffffff"
+            border.color: Theme.border
 
             opacity: root.popupOpen ? 1 : 0
             transform: Translate { y: root.popupOpen ? 0 : -12; Behavior on y { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } } }
@@ -191,9 +186,9 @@ Item {
                     spacing: 12
 
                     Rectangle {
-                        width: 56; height: 56; radius: 10; color: "#1affffff"; clip: true
+                        width: 56; height: 56; radius: 10; color: Theme.surface; clip: true
                         Image { anchors.fill: parent; source: root.player && root.player.trackArtUrl ? root.player.trackArtUrl : ""; fillMode: Image.PreserveAspectCrop; visible: source !== "" }
-                        Text { anchors.centerIn: parent; text: "\uf001"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 20; visible: !root.player || !root.player.trackArtUrl }
+                        Text { anchors.centerIn: parent; text: "\uf001"; color: Theme.textMuted; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 20; visible: !root.player || !root.player.trackArtUrl }
                     }
 
                     Column {
@@ -201,7 +196,7 @@ Item {
                         anchors.verticalCenter: parent.verticalCenter
                         spacing: 4
                         Text { width: parent.width; text: root.title; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 14; font.bold: true; elide: Text.ElideRight }
-                        Text { width: parent.width; text: root.artist !== "" ? root.artist : "No artist"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 12; elide: Text.ElideRight }
+                        Text { width: parent.width; text: root.artist !== "" ? root.artist : "No artist"; color: Theme.textMuted; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 12; elide: Text.ElideRight }
                     }
                 }
 
@@ -209,7 +204,7 @@ Item {
                     width: parent.width
                     height: 36
                     radius: 10
-                    color: root.showLyrics ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.22) : (lyrMouse.containsMouse ? "#28ffffff" : "#1affffff")
+                    color: root.showLyrics ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.22) : (lyrMouse.containsMouse ? Theme.surface : Theme.surface)
                     border.width: root.showLyrics ? 1 : 0
                     border.color: Theme.accent
 
@@ -227,14 +222,11 @@ Item {
                         hoverEnabled: true
                         onClicked: {
                             root.showLyrics = !root.showLyrics
-                            if (root.showLyrics && root.syncedLines.length === 0 && root.plainText === "") {
-                                root.fetchLyrics()
-                            }
+                            if (root.showLyrics && root.syncedLines.length === 0 && root.plainText === "") root.fetchLyrics()
                         }
                     }
                 }
 
-                // Live 1-line synced lyrics
                 Item {
                     visible: root.showLyrics && root.syncedLines.length > 0
                     width: parent.width
@@ -253,7 +245,6 @@ Item {
                     }
                 }
 
-                // Fallback plain lyrics if no timestamps exist
                 Flickable {
                     visible: root.showLyrics && root.syncedLines.length === 0
                     width: parent.width
