@@ -49,7 +49,7 @@ Row {
     Pill {
         Text {
             text: "\uf1eb  " + root.wifi
-            color: root.wifi === "Off" ? "#88e6e1ff" : "#e6e1ff"
+            color: root.wifi === "Off" ? Theme.text : Theme.text
             font.family: "JetBrainsMono Nerd Font"
             font.pixelSize: 13
             elide: Text.ElideRight
@@ -62,7 +62,7 @@ Row {
     Pill {
         Text {
             text: "\uf4bc " + root.cpu + "  \uf2db " + root.ram
-            color: "#e6e1ff"
+            color: Theme.text
             font.family: "JetBrainsMono Nerd Font"
             font.pixelSize: 13
             anchors.verticalCenter: parent.verticalCenter
@@ -74,7 +74,7 @@ Row {
         visible: root.bat !== ""
         Text {
             text: (root.charging ? "\uf0e7 " : "\uf240 ") + root.bat + "%"
-            color: root.charging ? Theme.accent : "#e6e1ff"
+            color: root.charging ? Theme.accent : Theme.text
             font.family: "JetBrainsMono Nerd Font"
             font.pixelSize: 13
             anchors.verticalCenter: parent.verticalCenter

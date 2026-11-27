@@ -179,14 +179,14 @@ Item {
                                 spacing: 8
                                 Text {
                                     text: modelData.icon
-                                    color: root.activeTab === modelData.id ? Theme.accent : "#b8b3d6"
+                                    color: root.activeTab === modelData.id ? Theme.accent : Theme.textMuted
                                     font.family: "JetBrainsMono Nerd Font"
                                     font.pixelSize: 13
                                     anchors.verticalCenter: parent.verticalCenter
                                 }
                                 Text {
                                     text: modelData.label
-                                    color: root.activeTab === modelData.id ? "#e6e1ff" : "#b8b3d6"
+                                    color: root.activeTab === modelData.id ? Theme.text : Theme.textMuted
                                     font.family: "JetBrainsMono Nerd Font"
                                     font.pixelSize: 13
                                     font.bold: root.activeTab === modelData.id
@@ -226,7 +226,7 @@ Item {
                             Text {
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 text: Qt.formatDateTime(clock.date, "HH")
-                                color: "#e6e1ff"
+                                color: Theme.text
                                 font.family: "JetBrainsMono Nerd Font"
                                 font.pixelSize: 34
                                 font.bold: true
@@ -242,7 +242,7 @@ Item {
                             Text {
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 text: Qt.formatDateTime(clock.date, "ddd").toUpperCase()
-                                color: "#88e6e1ff"
+                                color: Theme.text
                                 font.family: "JetBrainsMono Nerd Font"
                                 font.pixelSize: 12
                             }
@@ -281,14 +281,14 @@ Item {
                                         anchors.verticalCenter: parent.verticalCenter
                                         Text {
                                             text: root.weatherTemp
-                                            color: "#e6e1ff"
+                                            color: Theme.text
                                             font.family: "JetBrainsMono Nerd Font"
                                             font.pixelSize: 18
                                             font.bold: true
                                         }
                                         Text {
                                             text: root.weatherCond
-                                            color: "#99e6e1ff"
+                                            color: Theme.text
                                             font.family: "JetBrainsMono Nerd Font"
                                             font.pixelSize: 11
                                             elide: Text.ElideRight
@@ -312,7 +312,7 @@ Item {
 
                                     Text {
                                         text: root.greeting
-                                        color: "#e6e1ff"
+                                        color: Theme.text
                                         font.family: "JetBrainsMono Nerd Font"
                                         font.pixelSize: 13
                                         font.bold: true
@@ -328,7 +328,7 @@ Item {
                                             Text {
                                                 anchors.centerIn: parent
                                                 text: "\uf109 Gentoo"
-                                                color: "#b8b3d6"
+                                                color: Theme.textMuted
                                                 font.family: "JetBrainsMono Nerd Font"
                                                 font.pixelSize: 10
                                             }
@@ -339,7 +339,7 @@ Item {
                                             Text {
                                                 anchors.centerIn: parent
                                                 text: "\uf017 " + root.uptimeStr
-                                                color: "#b8b3d6"
+                                                color: Theme.textMuted
                                                 font.family: "JetBrainsMono Nerd Font"
                                                 font.pixelSize: 10
                                                 elide: Text.ElideRight
@@ -368,7 +368,7 @@ Item {
                                     width: parent.width
                                     Text {
                                         text: root.calData.title
-                                        color: "#e6e1ff"
+                                        color: Theme.text
                                         font.family: "JetBrainsMono Nerd Font"
                                         font.pixelSize: 14
                                         font.bold: true
@@ -379,12 +379,12 @@ Item {
                                         spacing: 6
                                         Rectangle {
                                             width: 24; height: 24; radius: 12; color: "#1affffff"
-                                            Text { anchors.centerIn: parent; text: "<"; color: "#e6e1ff"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 12 }
+                                            Text { anchors.centerIn: parent; text: "<"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 12 }
                                             MouseArea { anchors.fill: parent; onClicked: root.calOffset-- }
                                         }
                                         Rectangle {
                                             width: 24; height: 24; radius: 12; color: "#1affffff"
-                                            Text { anchors.centerIn: parent; text: ">"; color: "#e6e1ff"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 12 }
+                                            Text { anchors.centerIn: parent; text: ">"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 12 }
                                             MouseArea { anchors.fill: parent; onClicked: root.calOffset++ }
                                         }
                                     }
@@ -400,7 +400,7 @@ Item {
                                             width: (parent.width) / 7
                                             horizontalAlignment: Text.AlignHCenter
                                             text: modelData
-                                            color: "#88e6e1ff"
+                                            color: Theme.text
                                             font.family: "JetBrainsMono Nerd Font"
                                             font.pixelSize: 11
                                         }
@@ -423,7 +423,7 @@ Item {
                                             Text {
                                                 anchors.centerIn: parent
                                                 text: modelData.d
-                                                color: modelData.today ? "#12131a" : (modelData.cur ? "#e6e1ff" : "#44e6e1ff")
+                                                color: modelData.today ? (Theme.lightMode ? "#ffffff" : "#12131a") : (modelData.cur ? Theme.text : Theme.text)
                                                 font.family: "JetBrainsMono Nerd Font"
                                                 font.pixelSize: 12
                                                 font.bold: modelData.today
@@ -486,7 +486,7 @@ Item {
                                         Text {
                                             anchors.horizontalCenter: parent.horizontalCenter
                                             text: modelData.val + "%"
-                                            color: "#e6e1ff"
+                                            color: Theme.text
                                             font.family: "JetBrainsMono Nerd Font"
                                             font.pixelSize: 12
                                             font.bold: true
@@ -494,7 +494,7 @@ Item {
                                         Text {
                                             anchors.horizontalCenter: parent.horizontalCenter
                                             text: modelData.label
-                                            color: "#88e6e1ff"
+                                            color: Theme.text
                                             font.family: "JetBrainsMono Nerd Font"
                                             font.pixelSize: 10
                                         }
@@ -522,11 +522,11 @@ Item {
                         border.width: root.wifiOn ? 1 : 0; border.color: Theme.accent
                         Row {
                             anchors.fill: parent; anchors.leftMargin: 14; spacing: 12
-                            Text { text: "\uf1eb"; color: root.wifiOn ? Theme.accent : "#88e6e1ff"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 18; anchors.verticalCenter: parent.verticalCenter }
+                            Text { text: "\uf1eb"; color: root.wifiOn ? Theme.accent : Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 18; anchors.verticalCenter: parent.verticalCenter }
                             Column {
                                 anchors.verticalCenter: parent.verticalCenter
-                                Text { text: "Wi-Fi"; color: "#e6e1ff"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 13; font.bold: true }
-                                Text { text: root.wifiOn ? "On" : "Off"; color: "#99e6e1ff"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 }
+                                Text { text: "Wi-Fi"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 13; font.bold: true }
+                                Text { text: root.wifiOn ? "On" : "Off"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 }
                             }
                         }
                         MouseArea { anchors.fill: parent; onClicked: { root.wifiOn = !root.wifiOn; Quickshell.execDetached(["nmcli", "radio", "wifi", root.wifiOn ? "on" : "off"]) } }
@@ -539,11 +539,11 @@ Item {
                         border.width: root.btOn ? 1 : 0; border.color: Theme.accent
                         Row {
                             anchors.fill: parent; anchors.leftMargin: 14; spacing: 12
-                            Text { text: "\uf293"; color: root.btOn ? Theme.accent : "#88e6e1ff"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 18; anchors.verticalCenter: parent.verticalCenter }
+                            Text { text: "\uf293"; color: root.btOn ? Theme.accent : Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 18; anchors.verticalCenter: parent.verticalCenter }
                             Column {
                                 anchors.verticalCenter: parent.verticalCenter
-                                Text { text: "Bluetooth"; color: "#e6e1ff"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 13; font.bold: true }
-                                Text { text: root.btOn ? "On" : "Off"; color: "#99e6e1ff"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 }
+                                Text { text: "Bluetooth"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 13; font.bold: true }
+                                Text { text: root.btOn ? "On" : "Off"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 }
                             }
                         }
                         MouseArea { anchors.fill: parent; onClicked: { root.btOn = !root.btOn; Quickshell.execDetached(["bluetoothctl", "power", root.btOn ? "on" : "off"]) } }
@@ -556,11 +556,11 @@ Item {
                         border.width: root.gameMode ? 1 : 0; border.color: Theme.accent
                         Row {
                             anchors.fill: parent; anchors.leftMargin: 14; spacing: 12
-                            Text { text: "\uf11b"; color: root.gameMode ? Theme.accent : "#88e6e1ff"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 18; anchors.verticalCenter: parent.verticalCenter }
+                            Text { text: "\uf11b"; color: root.gameMode ? Theme.accent : Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 18; anchors.verticalCenter: parent.verticalCenter }
                             Column {
                                 anchors.verticalCenter: parent.verticalCenter
-                                Text { text: "Game Mode"; color: "#e6e1ff"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 13; font.bold: true }
-                                Text { text: root.gameMode ? "Performance" : "Off"; color: "#99e6e1ff"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 }
+                                Text { text: "Game Mode"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 13; font.bold: true }
+                                Text { text: root.gameMode ? "Performance" : "Off"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 }
                             }
                         }
                         MouseArea {
@@ -583,11 +583,11 @@ Item {
                         border.width: root.airplaneMode ? 1 : 0; border.color: Theme.accent
                         Row {
                             anchors.fill: parent; anchors.leftMargin: 14; spacing: 12
-                            Text { text: "\uf072"; color: root.airplaneMode ? Theme.accent : "#88e6e1ff"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 18; anchors.verticalCenter: parent.verticalCenter }
+                            Text { text: "\uf072"; color: root.airplaneMode ? Theme.accent : Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 18; anchors.verticalCenter: parent.verticalCenter }
                             Column {
                                 anchors.verticalCenter: parent.verticalCenter
-                                Text { text: "Airplane Mode"; color: "#e6e1ff"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 13; font.bold: true }
-                                Text { text: root.airplaneMode ? "On" : "Off"; color: "#99e6e1ff"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 }
+                                Text { text: "Airplane Mode"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 13; font.bold: true }
+                                Text { text: root.airplaneMode ? "On" : "Off"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 }
                             }
                         }
                         MouseArea {
@@ -612,11 +612,11 @@ Item {
                         border.width: root.keepAwake ? 1 : 0; border.color: Theme.accent
                         Row {
                             anchors.fill: parent; anchors.leftMargin: 14; spacing: 12
-                            Text { text: "\uf0f4"; color: root.keepAwake ? Theme.accent : "#88e6e1ff"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 18; anchors.verticalCenter: parent.verticalCenter }
+                            Text { text: "\uf0f4"; color: root.keepAwake ? Theme.accent : Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 18; anchors.verticalCenter: parent.verticalCenter }
                             Column {
                                 anchors.verticalCenter: parent.verticalCenter
-                                Text { text: "Keep Awake"; color: "#e6e1ff"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 13; font.bold: true }
-                                Text { text: root.keepAwake ? "Awake" : "Normal"; color: "#99e6e1ff"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 }
+                                Text { text: "Keep Awake"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 13; font.bold: true }
+                                Text { text: root.keepAwake ? "Awake" : "Normal"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 }
                             }
                         }
                         MouseArea {
@@ -639,11 +639,11 @@ Item {
                         border.width: !root.audioMuted ? 1 : 0; border.color: Theme.accent
                         Row {
                             anchors.fill: parent; anchors.leftMargin: 14; spacing: 12
-                            Text { text: root.audioMuted ? "\uf026" : "\uf028"; color: !root.audioMuted ? Theme.accent : "#88e6e1ff"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 18; anchors.verticalCenter: parent.verticalCenter }
+                            Text { text: root.audioMuted ? "\uf026" : "\uf028"; color: !root.audioMuted ? Theme.accent : Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 18; anchors.verticalCenter: parent.verticalCenter }
                             Column {
                                 anchors.verticalCenter: parent.verticalCenter
-                                Text { text: "Audio"; color: "#e6e1ff"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 13; font.bold: true }
-                                Text { text: root.audioMuted ? "Muted" : "Active"; color: "#99e6e1ff"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 }
+                                Text { text: "Audio"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 13; font.bold: true }
+                                Text { text: root.audioMuted ? "Muted" : "Active"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 }
                             }
                         }
                         MouseArea { anchors.fill: parent; onClicked: if (root.audioReady) root.sink.audio.muted = !root.sink.audio.muted }
@@ -656,11 +656,11 @@ Item {
                         border.width: Theme.blurEnabled ? 1 : 0; border.color: Theme.accent
                         Row {
                             anchors.fill: parent; anchors.leftMargin: 14; spacing: 12
-                            Text { text: "\uf0d0"; color: Theme.blurEnabled ? Theme.accent : "#88e6e1ff"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 18; anchors.verticalCenter: parent.verticalCenter }
+                            Text { text: "\uf0d0"; color: Theme.blurEnabled ? Theme.accent : Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 18; anchors.verticalCenter: parent.verticalCenter }
                             Column {
                                 anchors.verticalCenter: parent.verticalCenter
-                                Text { text: "Frosted Blur"; color: "#e6e1ff"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 13; font.bold: true }
-                                Text { text: Theme.blurEnabled ? "On" : "Off"; color: "#99e6e1ff"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 }
+                                Text { text: "Frosted Blur"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 13; font.bold: true }
+                                Text { text: Theme.blurEnabled ? "On" : "Off"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 }
                             }
                         }
                         MouseArea {
@@ -681,8 +681,8 @@ Item {
                             Text { text: "\uf013"; color: Theme.accent; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 18; anchors.verticalCenter: parent.verticalCenter }
                             Column {
                                 anchors.verticalCenter: parent.verticalCenter
-                                Text { text: "Settings"; color: "#e6e1ff"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 13; font.bold: true }
-                                Text { text: "Open"; color: "#99e6e1ff"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 }
+                                Text { text: "Settings"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 13; font.bold: true }
+                                Text { text: "Open"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 }
                             }
                         }
                         MouseArea {

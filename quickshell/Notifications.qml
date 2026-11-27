@@ -48,7 +48,7 @@ PanelWindow {
 
                 Text {
                     text: "✕"
-                    color: "#88e6e1ff"
+                    color: Theme.text
                     font.family: "JetBrainsMono Nerd Font"
                     font.pixelSize: 12
                     MouseArea {
@@ -64,7 +64,7 @@ PanelWindow {
             Text {
                 width: parent.width
                 text: NotifStore.currentNotif ? NotifStore.currentNotif.summary : ""
-                color: "#e6e1ff"
+                color: Theme.text
                 font.family: "JetBrainsMono Nerd Font"
                 font.pixelSize: 13
                 font.bold: true
@@ -75,7 +75,7 @@ PanelWindow {
                 visible: text !== ""
                 width: parent.width
                 text: NotifStore.currentNotif ? NotifStore.currentNotif.body : ""
-                color: "#b8b3d6"
+                color: Theme.textMuted
                 font.family: "JetBrainsMono Nerd Font"
                 font.pixelSize: 12
                 wrapMode: Text.WordWrap

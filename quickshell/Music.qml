@@ -125,12 +125,12 @@ Item {
                         width: 22; height: 22; radius: 5; color: "#1affffff"; clip: true
                         anchors.verticalCenter: parent.verticalCenter
                         Image { anchors.fill: parent; source: root.player && root.player.trackArtUrl ? root.player.trackArtUrl : ""; fillMode: Image.PreserveAspectCrop; visible: source !== "" }
-                        Text { anchors.centerIn: parent; text: "\uf001"; color: root.player && root.player.isPlaying ? Theme.accent : "#88e6e1ff"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 12; visible: !root.player || !root.player.trackArtUrl }
+                        Text { anchors.centerIn: parent; text: "\uf001"; color: root.player && root.player.isPlaying ? Theme.accent : Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 12; visible: !root.player || !root.player.trackArtUrl }
                     }
 
                     Text {
                         text: root.title
-                        color: "#e6e1ff"
+                        color: Theme.text
                         font.family: "JetBrainsMono Nerd Font"
                         font.pixelSize: 13
                         elide: Text.ElideRight
@@ -143,7 +143,7 @@ Item {
             }
 
             Text {
-                text: "\uf048"; color: "#b8b3d6"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 12; anchors.verticalCenter: parent.verticalCenter
+                text: "\uf048"; color: Theme.textMuted; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 12; anchors.verticalCenter: parent.verticalCenter
                 MouseArea { anchors.fill: parent; onClicked: if (root.player && root.player.canGoPrevious) root.player.previous() }
             }
             Text {
@@ -151,7 +151,7 @@ Item {
                 MouseArea { anchors.fill: parent; onClicked: if (root.player && root.player.canTogglePlaying) root.player.togglePlaying() }
             }
             Text {
-                text: "\uf051"; color: "#b8b3d6"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 12; anchors.verticalCenter: parent.verticalCenter
+                text: "\uf051"; color: Theme.textMuted; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 12; anchors.verticalCenter: parent.verticalCenter
                 MouseArea { anchors.fill: parent; onClicked: if (root.player && root.player.canGoNext) root.player.next() }
             }
         }
@@ -193,15 +193,15 @@ Item {
                     Rectangle {
                         width: 56; height: 56; radius: 10; color: "#1affffff"; clip: true
                         Image { anchors.fill: parent; source: root.player && root.player.trackArtUrl ? root.player.trackArtUrl : ""; fillMode: Image.PreserveAspectCrop; visible: source !== "" }
-                        Text { anchors.centerIn: parent; text: "\uf001"; color: "#66e6e1ff"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 20; visible: !root.player || !root.player.trackArtUrl }
+                        Text { anchors.centerIn: parent; text: "\uf001"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 20; visible: !root.player || !root.player.trackArtUrl }
                     }
 
                     Column {
                         width: parent.width - 68
                         anchors.verticalCenter: parent.verticalCenter
                         spacing: 4
-                        Text { width: parent.width; text: root.title; color: "#e6e1ff"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 14; font.bold: true; elide: Text.ElideRight }
-                        Text { width: parent.width; text: root.artist !== "" ? root.artist : "No artist"; color: "#99e6e1ff"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 12; elide: Text.ElideRight }
+                        Text { width: parent.width; text: root.title; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 14; font.bold: true; elide: Text.ElideRight }
+                        Text { width: parent.width; text: root.artist !== "" ? root.artist : "No artist"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 12; elide: Text.ElideRight }
                     }
                 }
 
@@ -216,7 +216,7 @@ Item {
                     Text {
                         anchors.centerIn: parent
                         text: root.showLyrics ? "Hide Lyrics" : "Lyrics"
-                        color: root.showLyrics ? Theme.accent : "#e6e1ff"
+                        color: root.showLyrics ? Theme.accent : Theme.text
                         font.family: "JetBrainsMono Nerd Font"
                         font.pixelSize: 13
                     }
@@ -265,7 +265,7 @@ Item {
                         id: lyricsLabel
                         width: parent.width
                         text: root.plainText
-                        color: "#d8d3f2"
+                        color: Theme.textMuted
                         font.family: "JetBrainsMono Nerd Font"
                         font.pixelSize: 12
                         wrapMode: Text.WordWrap

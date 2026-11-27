@@ -6,7 +6,7 @@ Text {
     property string info: "Weather…"
 
     text: info
-    color: "#e6e1ff"
+    color: Theme.text
     font.family: "JetBrainsMono Nerd Font"
     font.pixelSize: 15
     anchors.verticalCenter: parent.verticalCenter

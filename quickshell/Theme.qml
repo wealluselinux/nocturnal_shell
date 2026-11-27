@@ -5,11 +5,18 @@ import QtQuick
 
 Singleton {
     id: theme
+    property bool lightMode: false
     property color accent: "#c9b8ff"
-    property color bg: "#12131a"
+    property color bg: lightMode ? "#f3f1fa" : "#12131a"
     property real panelOpacity: 0.85
     property int shapeRadius: 12
     readonly property color panelBg: Qt.rgba(bg.r, bg.g, bg.b, panelOpacity)
+    readonly property color text: lightMode ? "#181924" : "#e6e1ff"
+    readonly property color textMuted: lightMode ? "#5c5a72" : "#b8b3d6"
+    readonly property color surface: lightMode ? "#14000000" : "#14ffffff"
+    readonly property color border: lightMode ? "#24000000" : "#22ffffff"
+    readonly property color splashBg: lightMode ? "#f3f1fa" : "#08090e"
+
     property string themePreset: "Nocturnal"
     property string wallpaper: ""
     property bool blurEnabled: true
@@ -21,6 +28,7 @@ Singleton {
     property bool widgetMusic: true
     property bool widgetSound: true
     property bool dockAutoHide: false
+    property bool cavaEnabled: false
     property bool use24h: false
     property int volumeLimit: 100
     property string barPosition: "top"
@@ -37,12 +45,12 @@ Singleton {
         onLoaded: {
             try {
                 var data = JSON.parse(text())
+                if (data.lightMode !== undefined) theme.lightMode = data.lightMode
                 if (data.accent) theme.accent = data.accent
-                if (data.bg) theme.bg = data.bg
-                if (data.panelOpacity !== undefined) theme.panelOpacity = data.panelOpacity
-                if (data.shapeRadius !== undefined) theme.shapeRadius = data.shapeRadius
                 if (data.themePreset) theme.themePreset = data.themePreset
                 if (data.wallpaper) theme.wallpaper = data.wallpaper
+                if (data.panelOpacity !== undefined) theme.panelOpacity = data.panelOpacity
+                if (data.shapeRadius !== undefined) theme.shapeRadius = data.shapeRadius
                 if (data.blurEnabled !== undefined) theme.blurEnabled = data.blurEnabled
                 if (data.rounding !== undefined) theme.rounding = data.rounding
                 if (data.dockEnabled !== undefined) theme.dockEnabled = data.dockEnabled
@@ -52,6 +60,7 @@ Singleton {
                 if (data.widgetMusic !== undefined) theme.widgetMusic = data.widgetMusic
                 if (data.widgetSound !== undefined) theme.widgetSound = data.widgetSound
                 if (data.dockAutoHide !== undefined) theme.dockAutoHide = data.dockAutoHide
+                if (data.cavaEnabled !== undefined) theme.cavaEnabled = data.cavaEnabled
                 if (data.use24h !== undefined) theme.use24h = data.use24h
                 if (data.volumeLimit !== undefined) theme.volumeLimit = data.volumeLimit
                 if (data.barPosition) theme.barPosition = data.barPosition
@@ -77,18 +86,19 @@ Singleton {
         }
     }
 
-    function syncKitty() {
-        Quickshell.execDetached([Quickshell.env("HOME") + "/nocturnal/bin/sync-kitty", theme.accent.toString()]); Quickshell.execDetached([Quickshell.env("HOME") + "/nocturnal/bin/sync-dolphin", theme.accent.toString()])
+    function syncApps() {
+        Quickshell.execDetached([Quickshell.env("HOME") + "/nocturnal/bin/sync-kitty", theme.accent.toString(), theme.lightMode ? "light" : "dark"])
+        Quickshell.execDetached([Quickshell.env("HOME") + "/nocturnal/bin/sync-dolphin", theme.accent.toString()])
     }
 
     function save() {
         settingsFile.setText(JSON.stringify({
+            lightMode: theme.lightMode,
             accent: theme.accent.toString(),
-            bg: theme.bg.toString(),
-            panelOpacity: theme.panelOpacity,
-            shapeRadius: theme.shapeRadius,
             themePreset: theme.themePreset,
             wallpaper: theme.wallpaper,
+            panelOpacity: theme.panelOpacity,
+            shapeRadius: theme.shapeRadius,
             blurEnabled: theme.blurEnabled,
             rounding: theme.rounding,
             dockEnabled: theme.dockEnabled,
@@ -98,6 +108,7 @@ Singleton {
             widgetMusic: theme.widgetMusic,
             widgetSound: theme.widgetSound,
             dockAutoHide: theme.dockAutoHide,
+            cavaEnabled: theme.cavaEnabled,
             use24h: theme.use24h,
             volumeLimit: theme.volumeLimit,
             barPosition: theme.barPosition,
@@ -105,7 +116,7 @@ Singleton {
             launcherPosition: theme.launcherPosition,
             rightPillOrder: theme.rightPillOrder
         }))
-        syncKitty()
+        syncApps()
     }
 
     function moveRightPill(idx, delta) {
@@ -126,11 +137,8 @@ Singleton {
     function togglePin(appId) {
         var next = theme.pinnedIds.slice()
         var idx = next.indexOf(appId)
-        if (idx >= 0) {
-            next.splice(idx, 1)
-        } else {
-            next.push(appId)
-        }
+        if (idx >= 0) next.splice(idx, 1)
+        else next.push(appId)
         theme.pinnedIds = next
         pinnedFile.setText(JSON.stringify(next))
     }

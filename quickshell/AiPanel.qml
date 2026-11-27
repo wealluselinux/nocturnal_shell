@@ -112,7 +112,7 @@ Scope {
 
                     Text {
                         text: "Nocturnal AI"
-                        color: "#e6e1ff"
+                        color: Theme.text
                         font.family: "JetBrainsMono Nerd Font"
                         font.pixelSize: 15
                         font.bold: true
@@ -149,7 +149,7 @@ Scope {
                         Text {
                             anchors.centerIn: parent
                             text: "\uf084"
-                            color: "#e6e1ff"
+                            color: Theme.text
                             font.family: "JetBrainsMono Nerd Font"
                             font.pixelSize: 12
                         }
@@ -170,7 +170,7 @@ Scope {
                         Text {
                             anchors.centerIn: parent
                             text: "Clear"
-                            color: "#b8b3d6"
+                            color: Theme.textMuted
                             font.family: "JetBrainsMono Nerd Font"
                             font.pixelSize: 10
                         }
@@ -201,7 +201,7 @@ Scope {
                             anchors.leftMargin: 10
                             anchors.rightMargin: 10
                             verticalAlignment: TextInput.AlignVCenter
-                            color: "#e6e1ff"
+                            color: Theme.text
                             font.family: "JetBrainsMono Nerd Font"
                             font.pixelSize: 12
                             echoMode: root.provider === "ollama" ? TextInput.Normal : TextInput.Password
@@ -210,7 +210,7 @@ Scope {
                                 anchors.fill: parent
                                 verticalAlignment: Text.AlignVCenter
                                 text: root.provider === "ollama" ? "Ollama model (e.g. llama3.2)" : "Paste " + root.provider + " API key..."
-                                color: "#66e6e1ff"
+                                color: Theme.text
                                 font: keyInput.font
                                 visible: keyInput.text === ""
                             }
@@ -225,7 +225,7 @@ Scope {
                         Text {
                             anchors.centerIn: parent
                             text: "Save"
-                            color: "#12131a"
+                            color: (Theme.lightMode ? "#ffffff" : "#12131a")
                             font.family: "JetBrainsMono Nerd Font"
                             font.pixelSize: 12
                             font.bold: true
@@ -252,7 +252,7 @@ Scope {
                         visible: root.messages.length === 0
                         text: "Ask anything...\nClick 🔑 to set your API key\nor click '" + root.provider + "' to switch."
                         horizontalAlignment: Text.AlignHCenter
-                        color: "#66e6e1ff"
+                        color: Theme.text
                         font.family: "JetBrainsMono Nerd Font"
                         font.pixelSize: 12
                         lineHeight: 1.4
@@ -283,7 +283,7 @@ Scope {
                                 anchors.top: parent.top
                                 anchors.margins: 9
                                 text: modelData.text
-                                color: "#e6e1ff"
+                                color: Theme.text
                                 font.family: "JetBrainsMono Nerd Font"
                                 font.pixelSize: 12
                                 wrapMode: Text.WordWrap
@@ -312,7 +312,7 @@ Scope {
                             anchors.leftMargin: 10
                             anchors.rightMargin: 10
                             verticalAlignment: TextInput.AlignVCenter
-                            color: "#e6e1ff"
+                            color: Theme.text
                             font.family: "JetBrainsMono Nerd Font"
                             font.pixelSize: 13
                             clip: true
@@ -327,7 +327,7 @@ Scope {
                                 anchors.fill: parent
                                 verticalAlignment: Text.AlignVCenter
                                 text: root.loading ? "Thinking..." : "Ask Nocturnal AI..."
-                                color: "#66e6e1ff"
+                                color: Theme.text
                                 font: promptInput.font
                                 visible: promptInput.text === ""
                             }
@@ -342,7 +342,7 @@ Scope {
                         Text {
                             anchors.centerIn: parent
                             text: root.loading ? "..." : "\uf1d8"
-                            color: "#12131a"
+                            color: (Theme.lightMode ? "#ffffff" : "#12131a")
                             font.family: "JetBrainsMono Nerd Font"
                             font.pixelSize: 14
                             font.bold: true

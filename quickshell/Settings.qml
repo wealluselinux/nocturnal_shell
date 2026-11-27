@@ -10,12 +10,11 @@ Scope {
     property string homeDir: Quickshell.env("HOME") || ""
 
     readonly property var themePresets: [
-        { name: "Nocturnal", bg: "#12131a", accent: "#c9b8ff" },
+        { name: "Nocturnal", bg: (Theme.lightMode ? "#ffffff" : "#12131a"), accent: "#c9b8ff" },
         { name: "Midnight",  bg: "#0e1420", accent: "#89dceb" },
         { name: "Forest",    bg: "#101714", accent: "#a6e3a1" },
         { name: "Ember",     bg: "#1a1214", accent: "#fab387" },
-        { name: "Crimson",   bg: "#191116", accent: "#f38ba8" },
-        { name: "Cyberpunk", bg: "#0a0b10", accent: "#00f0ff" }
+        { name: "Crimson",   bg: "#191116", accent: "#f38ba8" }
     ]
 
     IpcHandler {
@@ -41,7 +40,7 @@ Scope {
                     best = c
                 }
             }
-            var tuned = Qt.hsla(best.hslHue, Math.max(0.55, best.hslSaturation), Math.max(0.72, best.hslLightness), 1.0)
+            var tuned = Qt.hsla(best.hslHue, Math.max(0.55, best.hslSaturation), Theme.lightMode ? Math.min(0.45, Math.max(0.32, best.hslLightness)) : Math.max(0.72, best.hslLightness), 1.0)
             Theme.accent = tuned
             Theme.themePreset = "Wallpaper"
             Theme.save()
@@ -92,7 +91,7 @@ Scope {
         exclusionMode: ExclusionMode.Ignore
 
         implicitWidth: 660
-        implicitHeight: 580
+        implicitHeight: 610
         color: "transparent"
 
         onVisibleChanged: {
@@ -125,14 +124,45 @@ Scope {
                         visible: root.activeTab === "themes"
                         anchors.fill: parent
                         anchors.margins: 20
-                        spacing: 14
+                        spacing: 12
 
-                        Text {
-                            text: "Themes & Colors"
-                            color: "#e6e1ff"
-                            font.family: "JetBrainsMono Nerd Font"
-                            font.pixelSize: 17
-                            font.bold: true
+                        Row {
+                            width: parent.width
+                            Text {
+                                text: "Themes & Colors"
+                                color: Theme.text
+                                font.family: "JetBrainsMono Nerd Font"
+                                font.pixelSize: 17
+                                font.bold: true
+                                width: parent.width - 154
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                            Rectangle {
+                                width: 154; height: 32; radius: 16
+                                color: Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.22)
+                                border.width: 1; border.color: Theme.accent
+                                Text {
+                                    anchors.centerIn: parent
+                                    text: Theme.lightMode ? "☀ Daylight" : "🌙 Nocturnal"
+                                    color: Theme.text
+                                    font.family: "JetBrainsMono Nerd Font"
+                                    font.pixelSize: 12
+                                    font.bold: true
+                                }
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        root.open = false
+                                        Theme.lightMode = !Theme.lightMode
+                                        if (Theme.lightMode && Theme.accent.toString() === "#c9b8ff") Theme.accent = "#6b4ce6"
+                                        else if (!Theme.lightMode && Theme.accent.toString() === "#6b4ce6") Theme.accent = "#c9b8ff"
+                                        Theme.save()
+                                        var targetWall = Theme.lightMode ? "wall1.jpg" : "wall0.png"
+                                        root.applyWallpaper(targetWall)
+                                        Quickshell.execDetached(["quickshell", "ipc", "-p", root.homeDir + "/nocturnal/quickshell/shell.qml", "call", "splash", "play"])
+                                    }
+                                }
+                            }
                         }
 
                         Text {
@@ -152,7 +182,7 @@ Scope {
                                 Rectangle {
                                     required property var modelData
                                     width: parent.width
-                                    height: 42
+                                    height: 36
                                     radius: 10
                                     color: Theme.themePreset === modelData.name ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.2) : (pMouse.containsMouse ? "#1affffff" : "#0dffffff")
                                     border.width: Theme.themePreset === modelData.name ? 1 : 0
@@ -164,16 +194,14 @@ Scope {
                                         spacing: 12
 
                                         Rectangle {
-                                            width: 22
-                                            height: 22
-                                            radius: 11
+                                            width: 20; height: 20; radius: 10
                                             color: modelData.accent
                                             anchors.verticalCenter: parent.verticalCenter
                                         }
 
                                         Text {
                                             text: modelData.name
-                                            color: "#e6e1ff"
+                                            color: Theme.text
                                             font.family: "JetBrainsMono Nerd Font"
                                             font.pixelSize: 13
                                             font.bold: Theme.themePreset === modelData.name
@@ -187,7 +215,6 @@ Scope {
                                         hoverEnabled: true
                                         onClicked: {
                                             Theme.themePreset = modelData.name
-                                            Theme.bg = modelData.bg
                                             Theme.accent = modelData.accent
                                             Theme.save()
                                         }
@@ -200,13 +227,7 @@ Scope {
                         Column {
                             width: parent.width
                             spacing: 6
-                            Text {
-                                text: "TRANSPARENCY"
-                                color: Theme.accent
-                                font.family: "JetBrainsMono Nerd Font"
-                                font.pixelSize: 11
-                                font.bold: true
-                            }
+                            Text { text: "TRANSPARENCY"; color: Theme.accent; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11; font.bold: true }
                             Row {
                                 spacing: 8
                                 Repeater {
@@ -222,26 +243,24 @@ Scope {
                                         color: Math.abs(Theme.panelOpacity - modelData.val) < 0.05 ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.22) : "#1affffff"
                                         border.width: Math.abs(Theme.panelOpacity - modelData.val) < 0.05 ? 1 : 0
                                         border.color: Theme.accent
-                                        Text { anchors.centerIn: parent; text: modelData.label; color: "#e6e1ff"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 }
+                                        Text { anchors.centerIn: parent; text: modelData.label; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 }
                                         MouseArea { anchors.fill: parent; onClicked: { Theme.panelOpacity = modelData.val; Theme.save() } }
                                     }
                                 }
                             }
                         }
 
-                        // 24h Clock + Earbang Volume Limit
+                        // 24h Clock + Max Volume
                         Row {
                             width: parent.width
                             spacing: 8
-
                             Rectangle {
                                 width: 116; height: 32; radius: 8
                                 color: Theme.use24h ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.22) : "#1affffff"
                                 border.width: Theme.use24h ? 1 : 0; border.color: Theme.accent
-                                Text { anchors.centerIn: parent; text: Theme.use24h ? "Clock: 24h" : "Clock: 12h"; color: "#e6e1ff"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 }
+                                Text { anchors.centerIn: parent; text: Theme.use24h ? "Clock: 24h" : "Clock: 12h"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 }
                                 MouseArea { anchors.fill: parent; onClicked: { Theme.use24h = !Theme.use24h; Theme.save() } }
                             }
-
                             Repeater {
                                 model: [75, 85, 100]
                                 Rectangle {
@@ -249,7 +268,7 @@ Scope {
                                     width: 68; height: 32; radius: 8
                                     color: Theme.volumeLimit === modelData ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.22) : "#1affffff"
                                     border.width: Theme.volumeLimit === modelData ? 1 : 0; border.color: Theme.accent
-                                    Text { anchors.centerIn: parent; text: "Max " + modelData + "%"; color: "#e6e1ff"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 }
+                                    Text { anchors.centerIn: parent; text: "Max " + modelData + "%"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 }
                                     MouseArea { anchors.fill: parent; onClicked: { Theme.volumeLimit = modelData; Theme.save() } }
                                 }
                             }
@@ -259,13 +278,7 @@ Scope {
                         Column {
                             width: parent.width
                             spacing: 6
-                            Text {
-                                text: "SHAPE"
-                                color: Theme.accent
-                                font.family: "JetBrainsMono Nerd Font"
-                                font.pixelSize: 11
-                                font.bold: true
-                            }
+                            Text { text: "SHAPE"; color: Theme.accent; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11; font.bold: true }
                             Row {
                                 spacing: 8
                                 Repeater {
@@ -281,7 +294,7 @@ Scope {
                                         color: Theme.shapeRadius === modelData.val ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.22) : "#1affffff"
                                         border.width: Theme.shapeRadius === modelData.val ? 1 : 0
                                         border.color: Theme.accent
-                                        Text { anchors.centerIn: parent; text: modelData.label; color: "#e6e1ff"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 }
+                                        Text { anchors.centerIn: parent; text: modelData.label; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 }
                                         MouseArea {
                                             anchors.fill: parent
                                             onClicked: {
@@ -306,39 +319,21 @@ Scope {
 
                         Row {
                             width: parent.width
-
                             Text {
                                 text: "Wallpaper"
-                                color: "#e6e1ff"
+                                color: Theme.text
                                 font.family: "JetBrainsMono Nerd Font"
                                 font.pixelSize: 17
                                 font.bold: true
                                 width: parent.width - 130
                                 anchors.verticalCenter: parent.verticalCenter
                             }
-
                             Rectangle {
-                                width: 130
-                                height: 32
-                                radius: 8
+                                width: 130; height: 32; radius: 8
                                 color: browseMouse.containsMouse ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.22) : "#1affffff"
-                                border.width: 1
-                                border.color: Theme.accent
-
-                                Text {
-                                    anchors.centerIn: parent
-                                    text: "Browse File..."
-                                    color: "#e6e1ff"
-                                    font.family: "JetBrainsMono Nerd Font"
-                                    font.pixelSize: 12
-                                }
-
-                                MouseArea {
-                                    id: browseMouse
-                                    anchors.fill: parent
-                                    hoverEnabled: true
-                                    onClicked: browseWallProc.running = true
-                                }
+                                border.width: 1; border.color: Theme.accent
+                                Text { anchors.centerIn: parent; text: "Browse File..."; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 12 }
+                                MouseArea { id: browseMouse; anchors.fill: parent; hoverEnabled: true; onClicked: browseWallProc.running = true }
                             }
                         }
 
@@ -352,9 +347,7 @@ Scope {
 
                             delegate: Rectangle {
                                 required property string modelData
-                                width: 140
-                                height: 88
-                                radius: 10
+                                width: 140; height: 88; radius: 10
                                 color: "#14ffffff"
                                 border.width: Theme.wallpaper === modelData ? 2 : 1
                                 border.color: Theme.wallpaper === modelData ? Theme.accent : "#22ffffff"
@@ -368,10 +361,7 @@ Scope {
                                     asynchronous: true
                                 }
 
-                                MouseArea {
-                                    anchors.fill: parent
-                                    onClicked: root.applyWallpaper(modelData)
-                                }
+                                MouseArea { anchors.fill: parent; onClicked: root.applyWallpaper(modelData) }
                             }
                         }
                     }
@@ -381,70 +371,43 @@ Scope {
                         visible: root.activeTab === "position"
                         anchors.fill: parent
                         anchors.margins: 20
-                        spacing: 16
+                        spacing: 14
 
                         Text {
                             text: "Widgets & Position"
-                            color: "#e6e1ff"
+                            color: Theme.text
                             font.family: "JetBrainsMono Nerd Font"
                             font.pixelSize: 17
                             font.bold: true
                         }
 
-                        // Dock & Desktop Widgets Toggles
                         Column {
                             width: parent.width
                             spacing: 8
 
-                            Text {
-                                text: "SHOW / HIDE"
-                                color: Theme.accent
-                                font.family: "JetBrainsMono Nerd Font"
-                                font.pixelSize: 11
-                                font.bold: true
-                            }
+                            Text { text: "SHOW / HIDE"; color: Theme.accent; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11; font.bold: true }
 
                             Row {
-                                spacing: 10
-
+                                spacing: 8
                                 Rectangle {
-                                    width: 140
-                                    height: 36
-                                    radius: 8
+                                    width: 110; height: 34; radius: 8
                                     color: Theme.dockEnabled ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.22) : "#1affffff"
-                                    border.width: Theme.dockEnabled ? 1 : 0
-                                    border.color: Theme.accent
-
-                                    Text {
-                                        anchors.centerIn: parent
-                                        text: Theme.dockEnabled ? "Dock: ON" : "Dock: OFF"
-                                        color: "#e6e1ff"
-                                        font.family: "JetBrainsMono Nerd Font"
-                                        font.pixelSize: 12
-                                    }
-
-                                    MouseArea {
-                                        anchors.fill: parent
-                                        onClicked: {
-                                            Theme.dockEnabled = !Theme.dockEnabled
-                                            Theme.save()
-                                        }
-                                    }
+                                    border.width: Theme.dockEnabled ? 1 : 0; border.color: Theme.accent
+                                    Text { anchors.centerIn: parent; text: Theme.dockEnabled ? "Dock: ON" : "Dock: OFF"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 }
+                                    MouseArea { anchors.fill: parent; onClicked: { Theme.dockEnabled = !Theme.dockEnabled; Theme.save() } }
                                 }
-
                                 Rectangle {
-                                    width: 140; height: 36; radius: 8
+                                    width: 132; height: 34; radius: 8
                                     color: Theme.dockAutoHide ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.22) : "#1affffff"
                                     border.width: Theme.dockAutoHide ? 1 : 0; border.color: Theme.accent
-                                    Text { anchors.centerIn: parent; text: Theme.dockAutoHide ? "Auto-Hide: ON" : "Auto-Hide: OFF"; color: "#e6e1ff"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 }
+                                    Text { anchors.centerIn: parent; text: Theme.dockAutoHide ? "Auto-Hide: ON" : "Auto-Hide: OFF"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 }
                                     MouseArea { anchors.fill: parent; onClicked: { Theme.dockAutoHide = !Theme.dockAutoHide; Theme.save() } }
                                 }
-
                                 Rectangle {
-                                    width: 130; height: 36; radius: 8
+                                    width: 120; height: 34; radius: 8
                                     color: Theme.widgetsEnabled ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.22) : "#1affffff"
                                     border.width: Theme.widgetsEnabled ? 1 : 0; border.color: Theme.accent
-                                    Text { anchors.centerIn: parent; text: Theme.widgetsEnabled ? "Widgets: ON" : "Widgets: OFF"; color: "#e6e1ff"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 }
+                                    Text { anchors.centerIn: parent; text: Theme.widgetsEnabled ? "Widgets: ON" : "Widgets: OFF"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 }
                                     MouseArea { anchors.fill: parent; onClicked: { Theme.widgetsEnabled = !Theme.widgetsEnabled; Theme.save() } }
                                 }
                             }
@@ -463,7 +426,7 @@ Scope {
                                         width: 78; height: 30; radius: 8
                                         color: Theme[modelData.key] ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.22) : "#1affffff"
                                         border.width: Theme[modelData.key] ? 1 : 0; border.color: Theme.accent
-                                        Text { anchors.centerIn: parent; text: modelData.label; color: "#e6e1ff"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 }
+                                        Text { anchors.centerIn: parent; text: modelData.label; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 }
                                         MouseArea { anchors.fill: parent; onClicked: { Theme[modelData.key] = !Theme[modelData.key]; Theme.save() } }
                                     }
                                 }
@@ -473,49 +436,32 @@ Scope {
                                     MouseArea { anchors.fill: parent; onClicked: Quickshell.execDetached(["quickshell", "ipc", "-p", root.homeDir + "/nocturnal/quickshell/shell.qml", "call", "widgets", "reset"]) }
                                 }
                             }
+
+                            Rectangle {
+                                width: 140; height: 32; radius: 8
+                                color: Theme.cavaEnabled ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.22) : "#1affffff"
+                                border.width: Theme.cavaEnabled ? 1 : 0; border.color: Theme.accent
+                                Text { anchors.centerIn: parent; text: Theme.cavaEnabled ? "Cava: ON" : "Cava: OFF"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 }
+                                MouseArea { anchors.fill: parent; onClicked: { Theme.cavaEnabled = !Theme.cavaEnabled; Theme.save() } }
+                            }
                         }
 
                         // Bar Position
                         Column {
                             width: parent.width
                             spacing: 8
-
-                            Text {
-                                text: "BAR POSITION"
-                                color: Theme.accent
-                                font.family: "JetBrainsMono Nerd Font"
-                                font.pixelSize: 11
-                                font.bold: true
-                            }
-
+                            Text { text: "BAR POSITION"; color: Theme.accent; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11; font.bold: true }
                             Row {
                                 spacing: 8
                                 Repeater {
                                     model: ["top", "bottom", "left", "right"]
                                     Rectangle {
                                         required property string modelData
-                                        width: 82
-                                        height: 34
-                                        radius: 8
+                                        width: 82; height: 34; radius: 8
                                         color: Theme.barPosition === modelData ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.22) : "#1affffff"
-                                        border.width: Theme.barPosition === modelData ? 1 : 0
-                                        border.color: Theme.accent
-
-                                        Text {
-                                            anchors.centerIn: parent
-                                            text: modelData.charAt(0).toUpperCase() + modelData.slice(1)
-                                            color: "#e6e1ff"
-                                            font.family: "JetBrainsMono Nerd Font"
-                                            font.pixelSize: 12
-                                        }
-
-                                        MouseArea {
-                                            anchors.fill: parent
-                                            onClicked: {
-                                                Theme.barPosition = modelData
-                                                Theme.save()
-                                            }
-                                        }
+                                        border.width: Theme.barPosition === modelData ? 1 : 0; border.color: Theme.accent
+                                        Text { anchors.centerIn: parent; text: modelData.charAt(0).toUpperCase() + modelData.slice(1); color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 12 }
+                                        MouseArea { anchors.fill: parent; onClicked: { Theme.barPosition = modelData; Theme.save() } }
                                     }
                                 }
                             }
@@ -525,43 +471,18 @@ Scope {
                         Column {
                             width: parent.width
                             spacing: 8
-
-                            Text {
-                                text: "DOCK POSITION"
-                                color: Theme.accent
-                                font.family: "JetBrainsMono Nerd Font"
-                                font.pixelSize: 11
-                                font.bold: true
-                            }
-
+                            Text { text: "DOCK POSITION"; color: Theme.accent; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11; font.bold: true }
                             Row {
                                 spacing: 10
                                 Repeater {
                                     model: ["left", "middle", "right"]
                                     Rectangle {
                                         required property string modelData
-                                        width: 110
-                                        height: 36
-                                        radius: 8
+                                        width: 110; height: 34; radius: 8
                                         color: Theme.dockPosition === modelData ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.22) : "#1affffff"
-                                        border.width: Theme.dockPosition === modelData ? 1 : 0
-                                        border.color: Theme.accent
-
-                                        Text {
-                                            anchors.centerIn: parent
-                                            text: modelData.charAt(0).toUpperCase() + modelData.slice(1)
-                                            color: "#e6e1ff"
-                                            font.family: "JetBrainsMono Nerd Font"
-                                            font.pixelSize: 13
-                                        }
-
-                                        MouseArea {
-                                            anchors.fill: parent
-                                            onClicked: {
-                                                Theme.dockPosition = modelData
-                                                Theme.save()
-                                            }
-                                        }
+                                        border.width: Theme.dockPosition === modelData ? 1 : 0; border.color: Theme.accent
+                                        Text { anchors.centerIn: parent; text: modelData.charAt(0).toUpperCase() + modelData.slice(1); color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 12 }
+                                        MouseArea { anchors.fill: parent; onClicked: { Theme.dockPosition = modelData; Theme.save() } }
                                     }
                                 }
                             }
@@ -571,43 +492,18 @@ Scope {
                         Column {
                             width: parent.width
                             spacing: 8
-
-                            Text {
-                                text: "APP CHOOSER POSITION"
-                                color: Theme.accent
-                                font.family: "JetBrainsMono Nerd Font"
-                                font.pixelSize: 11
-                                font.bold: true
-                            }
-
+                            Text { text: "APP CHOOSER POSITION"; color: Theme.accent; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11; font.bold: true }
                             Row {
                                 spacing: 10
                                 Repeater {
                                     model: ["left", "middle", "right"]
                                     Rectangle {
                                         required property string modelData
-                                        width: 110
-                                        height: 36
-                                        radius: 8
+                                        width: 110; height: 34; radius: 8
                                         color: Theme.launcherPosition === modelData ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.22) : "#1affffff"
-                                        border.width: Theme.launcherPosition === modelData ? 1 : 0
-                                        border.color: Theme.accent
-
-                                        Text {
-                                            anchors.centerIn: parent
-                                            text: modelData.charAt(0).toUpperCase() + modelData.slice(1)
-                                            color: "#e6e1ff"
-                                            font.family: "JetBrainsMono Nerd Font"
-                                            font.pixelSize: 13
-                                        }
-
-                                        MouseArea {
-                                            anchors.fill: parent
-                                            onClicked: {
-                                                Theme.launcherPosition = modelData
-                                                Theme.save()
-                                            }
-                                        }
+                                        border.width: Theme.launcherPosition === modelData ? 1 : 0; border.color: Theme.accent
+                                        Text { anchors.centerIn: parent; text: modelData.charAt(0).toUpperCase() + modelData.slice(1); color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 12 }
+                                        MouseArea { anchors.fill: parent; onClicked: { Theme.launcherPosition = modelData; Theme.save() } }
                                     }
                                 }
                             }
@@ -623,11 +519,7 @@ Scope {
 
                         Row {
                             spacing: 14
-                            MoonLogo {
-                                width: 52
-                                height: 52
-                                anchors.verticalCenter: parent.verticalCenter
-                            }
+                            MoonLogo { width: 52; height: 52; anchors.verticalCenter: parent.verticalCenter }
                             Text {
                                 text: "Nocturnal Shell"
                                 color: Theme.accent
@@ -640,49 +532,25 @@ Scope {
 
                         Text {
                             text: "Made by rig\nBuilt off Hyprland"
-                            color: "#e6e1ff"
+                            color: Theme.text
                             font.family: "JetBrainsMono Nerd Font"
                             font.pixelSize: 14
                             lineHeight: 1.5
                         }
 
-                        Rectangle {
-                            width: parent.width
-                            height: 1
-                            color: "#22ffffff"
-                        }
+                        Rectangle { width: parent.width; height: 1; color: "#22ffffff" }
 
                         Column {
                             spacing: 8
-
-                            Text {
-                                text: "Compositor: Hyprland 0.56.2 (Lua)"
-                                color: "#b8b3d6"
-                                font.family: "JetBrainsMono Nerd Font"
-                                font.pixelSize: 13
-                            }
-                            Text {
-                                text: "Shell UI:   Quickshell (QML)"
-                                color: "#b8b3d6"
-                                font.family: "JetBrainsMono Nerd Font"
-                                font.pixelSize: 13
-                            }
-                            Text {
-                                text: "OS:         Gentoo Linux"
-                                color: "#b8b3d6"
-                                font.family: "JetBrainsMono Nerd Font"
-                                font.pixelSize: 13
-                            }
+                            Text { text: "Compositor: Hyprland 0.56.2 (Lua)"; color: Theme.textMuted; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 13 }
+                            Text { text: "Shell UI:   Quickshell (QML)"; color: Theme.textMuted; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 13 }
+                            Text { text: "OS:         Gentoo Linux"; color: Theme.textMuted; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 13 }
                         }
                     }
                 }
 
                 // VERTICAL DIVIDER
-                Rectangle {
-                    width: 1
-                    height: parent.height
-                    color: "#22ffffff"
-                }
+                Rectangle { width: 1; height: parent.height; color: "#22ffffff" }
 
                 // RIGHT SIDEBAR
                 Column {
@@ -695,7 +563,7 @@ Scope {
                         width: parent.width - 28
                         Text {
                             text: "Settings"
-                            color: "#88e6e1ff"
+                            color: Theme.text
                             font.family: "JetBrainsMono Nerd Font"
                             font.pixelSize: 12
                             font.bold: true
@@ -704,13 +572,10 @@ Scope {
                         }
                         Text {
                             text: "✕"
-                            color: "#88e6e1ff"
+                            color: Theme.text
                             font.family: "JetBrainsMono Nerd Font"
                             font.pixelSize: 15
-                            MouseArea {
-                                anchors.fill: parent
-                                onClicked: root.open = false
-                            }
+                            MouseArea { anchors.fill: parent; onClicked: root.open = false }
                         }
                     }
 
@@ -738,7 +603,7 @@ Scope {
                                 anchors.left: parent.left
                                 anchors.leftMargin: 12
                                 text: modelData.label
-                                color: root.activeTab === modelData.id ? Theme.accent : "#e6e1ff"
+                                color: root.activeTab === modelData.id ? Theme.accent : Theme.text
                                 font.family: "JetBrainsMono Nerd Font"
                                 font.pixelSize: 13
                                 font.bold: root.activeTab === modelData.id

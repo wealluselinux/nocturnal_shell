@@ -82,7 +82,7 @@ Scope {
                         anchors.centerIn: parent
                         visible: root.dockApps.length === 0
                         text: "Pin apps in Launcher"
-                        color: "#66e6e1ff"
+                        color: Theme.text
                         font.family: "JetBrainsMono Nerd Font"
                         font.pixelSize: 11
                     }

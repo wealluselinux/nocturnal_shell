@@ -164,7 +164,7 @@ Variants {
                                     Text {
                                         anchors.verticalCenter: parent.verticalCenter
                                         text: wsBtn.wsId
-                                        color: wsBtn.isFocused ? "#12131a" : (wsBtn.wsApps.length > 0 ? "#e6e1ff" : "#77e6e1ff")
+                                        color: wsBtn.isFocused ? (Theme.lightMode ? "#ffffff" : "#12131a") : (wsBtn.wsApps.length > 0 ? Theme.text : Theme.text)
                                         font.family: "JetBrainsMono Nerd Font"
                                         font.pixelSize: 11
                                         font.bold: wsBtn.isFocused
@@ -208,7 +208,7 @@ Variants {
                         Text {
                             id: clockText
                             text: Qt.formatDateTime(clock.date, Theme.use24h ? "HH:mm  ·  ddd d MMM" : "h:mm AP  ·  ddd d MMM")
-                            color: "#e6e1ff"
+                            color: Theme.text
                             font.family: "JetBrainsMono Nerd Font"
                             font.pixelSize: 13
                             font.bold: true
@@ -247,10 +247,10 @@ Variants {
                                     return (barWin.muted ? "\uf026  " : "\uf028  ") + Math.round(barWin.vol * 100) + "%"
                                 }
                                 color: {
-                                    if (rPill.modelData === "wifi" && barWin.wifi === "Off") return "#88e6e1ff"
+                                    if (rPill.modelData === "wifi" && barWin.wifi === "Off") return Theme.text
                                     if (rPill.modelData === "battery" && barWin.charging) return Theme.accent
-                                    if (rPill.modelData === "volume" && barWin.muted) return "#88e6e1ff"
-                                    return "#e6e1ff"
+                                    if (rPill.modelData === "volume" && barWin.muted) return Theme.text
+                                    return Theme.text
                                 }
                                 font.family: "JetBrainsMono Nerd Font"
                                 font.pixelSize: 13
@@ -333,7 +333,7 @@ Variants {
                                 Text {
                                     anchors.centerIn: parent
                                     text: index + 1
-                                    color: (Hyprland.focusedWorkspace && Hyprland.focusedWorkspace.id === index + 1) ? "#12131a" : "#e6e1ff"
+                                    color: (Hyprland.focusedWorkspace && Hyprland.focusedWorkspace.id === index + 1) ? (Theme.lightMode ? "#ffffff" : "#12131a") : Theme.text
                                     font.family: "JetBrainsMono Nerd Font"
                                     font.pixelSize: 12
                                     font.bold: (Hyprland.focusedWorkspace && Hyprland.focusedWorkspace.id === index + 1)
@@ -356,7 +356,7 @@ Variants {
                     Text {
                         anchors.horizontalCenter: parent.horizontalCenter
                         text: Qt.formatDateTime(clock.date, "HH")
-                        color: "#e6e1ff"
+                        color: Theme.text
                         font.family: "JetBrainsMono Nerd Font"
                         font.pixelSize: 15
                         font.bold: true
@@ -390,7 +390,7 @@ Variants {
                     Text {
                         anchors.horizontalCenter: parent.horizontalCenter
                         text: "\uf1eb"
-                        color: barWin.wifi === "Off" ? "#66e6e1ff" : "#e6e1ff"
+                        color: barWin.wifi === "Off" ? Theme.text : Theme.text
                         font.family: "JetBrainsMono Nerd Font"
                         font.pixelSize: 14
                     }
@@ -398,7 +398,7 @@ Variants {
                         visible: barWin.bat !== ""
                         anchors.horizontalCenter: parent.horizontalCenter
                         text: barWin.bat + "%"
-                        color: barWin.charging ? Theme.accent : "#e6e1ff"
+                        color: barWin.charging ? Theme.accent : Theme.text
                         font.family: "JetBrainsMono Nerd Font"
                         font.pixelSize: 10
                         font.bold: true
@@ -406,7 +406,7 @@ Variants {
                     Text {
                         anchors.horizontalCenter: parent.horizontalCenter
                         text: barWin.muted ? "\uf026" : "\uf028"
-                        color: barWin.muted ? "#66e6e1ff" : Theme.accent
+                        color: barWin.muted ? Theme.text : Theme.accent
                         font.family: "JetBrainsMono Nerd Font"
                         font.pixelSize: 14
                     }

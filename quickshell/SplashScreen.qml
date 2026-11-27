@@ -59,7 +59,7 @@ Scope {
 
             Rectangle {
                 anchors.fill: parent
-                color: "#08090e"
+                color: Theme.splashBg
                 opacity: root.bgOpacity
 
                 Column {
@@ -76,7 +76,7 @@ Scope {
 
                     Text {
                         anchors.horizontalCenter: parent.horizontalCenter
-                        text: "NOCTURNAL"
+                        text: Theme.lightMode ? "DAYLIGHT" : "NOCTURNAL"
                         color: Theme.accent
                         font.family: "JetBrainsMono Nerd Font"
                         font.pixelSize: 22

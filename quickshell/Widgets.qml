@@ -95,22 +95,22 @@ Scope {
 
                         Row {
                             width: parent.width; spacing: 10
-                            Text { text: Qt.formatDateTime(clock.date, Theme.use24h ? "HH:mm" : "h:mm"); color: "#e6e1ff"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 28; font.bold: true; anchors.verticalCenter: parent.verticalCenter }
+                            Text { text: Qt.formatDateTime(clock.date, Theme.use24h ? "HH:mm" : "h:mm"); color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 28; font.bold: true; anchors.verticalCenter: parent.verticalCenter }
                             Column {
                                 anchors.verticalCenter: parent.verticalCenter
                                 Text { text: root.weatherTemp; color: Theme.accent; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 13; font.bold: true }
-                                Text { text: root.weatherCond; color: "#99e6e1ff"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 10; elide: Text.ElideRight; width: 78 }
+                                Text { text: root.weatherCond; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 10; elide: Text.ElideRight; width: 78 }
                             }
                         }
 
-                        Text { text: Qt.formatDateTime(clock.date, "dddd, MMM d"); color: "#b8b3d6"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 12 }
+                        Text { text: Qt.formatDateTime(clock.date, "dddd, MMM d"); color: Theme.textMuted; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 12 }
                         Rectangle { width: parent.width; height: 1; color: "#22ffffff" }
 
                         Grid {
                             width: parent.width; columns: 7; rowSpacing: 4
                             Repeater {
                                 model: ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"]
-                                Text { required property string modelData; width: 26; horizontalAlignment: Text.AlignHCenter; text: modelData; color: "#88e6e1ff"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 10; font.bold: true }
+                                Text { required property string modelData; width: 26; horizontalAlignment: Text.AlignHCenter; text: modelData; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 10; font.bold: true }
                             }
                         }
 
@@ -122,7 +122,7 @@ Scope {
                                     required property var modelData
                                     width: 26; height: 24; radius: 6
                                     color: modelData.isToday ? Theme.accent : "transparent"
-                                    Text { anchors.centerIn: parent; text: modelData.d; color: modelData.isToday ? "#12131a" : "#e6e1ff"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11; font.bold: modelData.isToday }
+                                    Text { anchors.centerIn: parent; text: modelData.d; color: modelData.isToday ? (Theme.lightMode ? "#ffffff" : "#12131a") : Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11; font.bold: modelData.isToday }
                                 }
                             }
                         }
@@ -142,17 +142,17 @@ Scope {
                             Item {
                                 required property int index
                                 anchors.fill: parent; rotation: index * 30
-                                Rectangle { anchors.horizontalCenter: parent.horizontalCenter; anchors.top: parent.top; anchors.topMargin: 5; width: index % 3 === 0 ? 2 : 1; height: index % 3 === 0 ? 8 : 5; color: index % 3 === 0 ? Theme.accent : "#66e6e1ff" }
+                                Rectangle { anchors.horizontalCenter: parent.horizontalCenter; anchors.top: parent.top; anchors.topMargin: 5; width: index % 3 === 0 ? 2 : 1; height: index % 3 === 0 ? 8 : 5; color: index % 3 === 0 ? Theme.accent : Theme.text }
                             }
                         }
 
                         Item {
                             anchors.fill: parent; rotation: (clock.date.getHours() % 12) * 30 + clock.date.getMinutes() * 0.5
-                            Rectangle { anchors.horizontalCenter: parent.horizontalCenter; anchors.bottom: parent.verticalCenter; width: 3; height: 32; radius: 2; color: "#e6e1ff" }
+                            Rectangle { anchors.horizontalCenter: parent.horizontalCenter; anchors.bottom: parent.verticalCenter; width: 3; height: 32; radius: 2; color: Theme.text }
                         }
                         Item {
                             anchors.fill: parent; rotation: clock.date.getMinutes() * 6
-                            Rectangle { anchors.horizontalCenter: parent.horizontalCenter; anchors.bottom: parent.verticalCenter; width: 2; height: 44; radius: 1; color: "#e6e1ff" }
+                            Rectangle { anchors.horizontalCenter: parent.horizontalCenter; anchors.bottom: parent.verticalCenter; width: 2; height: 44; radius: 1; color: Theme.text }
                         }
                         Item {
                             anchors.fill: parent; rotation: clock.date.getSeconds() * 6
@@ -173,17 +173,17 @@ Scope {
                             width: 76; height: 76; radius: 10; color: "#1affffff"; clip: true
                             anchors.horizontalCenter: parent.horizontalCenter
                             Image { anchors.fill: parent; source: root.player && root.player.trackArtUrl ? root.player.trackArtUrl : ""; fillMode: Image.PreserveAspectCrop; visible: source !== "" }
-                            Text { anchors.centerIn: parent; text: "\uf001"; color: "#66e6e1ff"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 22; visible: !root.player || !root.player.trackArtUrl }
+                            Text { anchors.centerIn: parent; text: "\uf001"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 22; visible: !root.player || !root.player.trackArtUrl }
                         }
 
-                        Text { width: parent.width; horizontalAlignment: Text.AlignHCenter; text: root.player && root.player.trackTitle ? root.player.trackTitle : "Nothing playing"; color: "#e6e1ff"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 12; font.bold: true; elide: Text.ElideRight }
-                        Text { width: parent.width; horizontalAlignment: Text.AlignHCenter; text: root.player && root.player.trackArtist ? root.player.trackArtist : ""; color: "#88e6e1ff"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 10; elide: Text.ElideRight }
+                        Text { width: parent.width; horizontalAlignment: Text.AlignHCenter; text: root.player && root.player.trackTitle ? root.player.trackTitle : "Nothing playing"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 12; font.bold: true; elide: Text.ElideRight }
+                        Text { width: parent.width; horizontalAlignment: Text.AlignHCenter; text: root.player && root.player.trackArtist ? root.player.trackArtist : ""; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 10; elide: Text.ElideRight }
 
                         Row {
                             anchors.horizontalCenter: parent.horizontalCenter; spacing: 14
 
                             Text {
-                                text: "\uf048"; color: "#b8b3d6"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 13; anchors.verticalCenter: parent.verticalCenter
+                                text: "\uf048"; color: Theme.textMuted; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 13; anchors.verticalCenter: parent.verticalCenter
                                 MouseArea { anchors.fill: parent; onClicked: if (root.player && root.player.canGoPrevious) root.player.previous() }
                             }
 
@@ -194,7 +194,7 @@ Scope {
                             }
 
                             Text {
-                                text: "\uf051"; color: "#b8b3d6"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 13; anchors.verticalCenter: parent.verticalCenter
+                                text: "\uf051"; color: Theme.textMuted; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 13; anchors.verticalCenter: parent.verticalCenter
                                 MouseArea { anchors.fill: parent; onClicked: if (root.player && root.player.canGoNext) root.player.next() }
                             }
                         }
@@ -215,11 +215,11 @@ Scope {
                                 id: soundIcon
                                 anchors.left: parent.left; anchors.verticalCenter: parent.verticalCenter
                                 text: root.muted ? "\uf026" : "\uf028"
-                                color: root.muted ? "#66e6e1ff" : Theme.accent
+                                color: root.muted ? Theme.text : Theme.accent
                                 font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 20
                                 MouseArea { anchors.fill: parent; anchors.margins: -6; onClicked: if (root.audioReady) root.sink.audio.muted = !root.sink.audio.muted }
                             }
-                            Text { anchors.left: soundIcon.right; anchors.leftMargin: 12; anchors.verticalCenter: parent.verticalCenter; text: "Sound"; color: "#e6e1ff"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 13; font.bold: true }
+                            Text { anchors.left: soundIcon.right; anchors.leftMargin: 12; anchors.verticalCenter: parent.verticalCenter; text: "Sound"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 13; font.bold: true }
                             Text { anchors.right: parent.right; anchors.verticalCenter: parent.verticalCenter; text: Math.round(root.vol * 100) + "%"; color: Theme.accent; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 13; font.bold: true }
                         }
 
@@ -230,10 +230,10 @@ Scope {
                             Rectangle {
                                 anchors.verticalCenter: parent.verticalCenter
                                 width: parent.width; height: 8; radius: 4; color: "#22ffffff"
-                                Rectangle { width: parent.width * Math.max(0, Math.min(Theme.volumeLimit / 100.0, root.vol)); height: parent.height; radius: 4; color: root.muted ? "#66e6e1ff" : Theme.accent }
+                                Rectangle { width: parent.width * Math.max(0, Math.min(Theme.volumeLimit / 100.0, root.vol)); height: parent.height; radius: 4; color: root.muted ? Theme.text : Theme.accent }
                             }
                             Rectangle {
-                                width: 16; height: 16; radius: 8; color: "#e6e1ff"
+                                width: 16; height: 16; radius: 8; color: Theme.text
                                 anchors.verticalCenter: parent.verticalCenter
                                 x: Math.max(0, Math.min(slider.width - 16, Math.max(0, Math.min(Theme.volumeLimit / 100.0, root.vol)) * slider.width - 8))
                             }
@@ -252,7 +252,7 @@ Scope {
                                 anchors.fill: parent; anchors.leftMargin: 10; anchors.rightMargin: 10
                                 verticalAlignment: Text.AlignVCenter
                                 text: root.audioReady ? ((root.sink.nickname || root.sink.description || root.sink.name) + (root.outputs.length > 1 ? "  \uf0ec" : "")) : "No output"
-                                color: "#b8b3d6"; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11; elide: Text.ElideRight
+                                color: Theme.textMuted; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11; elide: Text.ElideRight
                             }
                             MouseArea { anchors.fill: parent; onClicked: root.nextOutput() }
                         }

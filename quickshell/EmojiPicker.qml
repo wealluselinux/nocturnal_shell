@@ -106,7 +106,7 @@ Scope {
                         anchors.leftMargin: 10
                         anchors.rightMargin: 10
                         verticalAlignment: TextInput.AlignVCenter
-                        color: "#e6e1ff"
+                        color: Theme.text
                         font.family: "JetBrainsMono Nerd Font"
                         font.pixelSize: 13
                         Keys.onEscapePressed: root.open = false
@@ -115,7 +115,7 @@ Scope {
                             anchors.fill: parent
                             verticalAlignment: Text.AlignVCenter
                             text: "Search emojis..."
-                            color: "#66e6e1ff"
+                            color: Theme.text
                             font: search.font
                             visible: search.text === ""
                         }

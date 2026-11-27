@@ -17,7 +17,7 @@ Item {
     Text {
         id: label
         text: (root.muted ? "\uf026  " : "\uf028  ") + Math.round(root.vol * 100) + "%"
-        color: root.muted ? "#88e6e1ff" : "#e6e1ff"
+        color: root.muted ? Theme.text : Theme.text
         font.family: "JetBrainsMono Nerd Font"
         font.pixelSize: 15
     }

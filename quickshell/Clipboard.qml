@@ -89,7 +89,7 @@ Scope {
                             anchors.leftMargin: 10
                             anchors.rightMargin: 10
                             verticalAlignment: TextInput.AlignVCenter
-                            color: "#e6e1ff"
+                            color: Theme.text
                             font.family: "JetBrainsMono Nerd Font"
                             font.pixelSize: 13
                             Keys.onEscapePressed: root.open = false
@@ -98,7 +98,7 @@ Scope {
                                 anchors.fill: parent
                                 verticalAlignment: Text.AlignVCenter
                                 text: "Search clipboard..."
-                                color: "#66e6e1ff"
+                                color: Theme.text
                                 font: search.font
                                 visible: search.text === ""
                             }
@@ -113,7 +113,7 @@ Scope {
                         Text {
                             anchors.centerIn: parent
                             text: "Clear"
-                            color: "#e6e1ff"
+                            color: Theme.text
                             font.family: "JetBrainsMono Nerd Font"
                             font.pixelSize: 11
                         }
@@ -137,7 +137,7 @@ Scope {
                         anchors.centerIn: parent
                         visible: win.filtered.length === 0
                         text: "Clipboard is empty"
-                        color: "#66e6e1ff"
+                        color: Theme.text
                         font.family: "JetBrainsMono Nerd Font"
                         font.pixelSize: 12
                     }
@@ -162,7 +162,7 @@ Scope {
                                 anchors.leftMargin: 10
                                 anchors.rightMargin: 10
                                 text: modelData
-                                color: "#e6e1ff"
+                                color: Theme.text
                                 font.family: "JetBrainsMono Nerd Font"
                                 font.pixelSize: 12
                                 elide: Text.ElideRight

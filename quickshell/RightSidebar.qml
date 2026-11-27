@@ -131,7 +131,7 @@ Scope {
 
                             Text {
                                 text: root.userHost
-                                color: "#e6e1ff"
+                                color: Theme.text
                                 font.family: "JetBrainsMono Nerd Font"
                                 font.pixelSize: 14
                                 font.bold: true
@@ -145,7 +145,7 @@ Scope {
                             Text {
                                 visible: root.uptimeStr !== ""
                                 text: "Up " + root.uptimeStr
-                                color: "#88e6e1ff"
+                                color: Theme.text
                                 font.family: "JetBrainsMono Nerd Font"
                                 font.pixelSize: 10
                             }
@@ -190,7 +190,7 @@ Scope {
                                 Text {
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     text: modelData.label
-                                    color: "#e6e1ff"
+                                    color: Theme.text
                                     font.family: "JetBrainsMono Nerd Font"
                                     font.pixelSize: 10
                                 }
@@ -222,7 +222,7 @@ Scope {
 
                     Text {
                         text: "Clear All"
-                        color: clearMouse.containsMouse ? "#e6e1ff" : "#88e6e1ff"
+                        color: clearMouse.containsMouse ? Theme.text : Theme.text
                         font.family: "JetBrainsMono Nerd Font"
                         font.pixelSize: 11
                         anchors.verticalCenter: parent.verticalCenter
@@ -243,7 +243,7 @@ Scope {
                         anchors.centerIn: parent
                         visible: notifList.count === 0
                         text: "No notifications"
-                        color: "#66e6e1ff"
+                        color: Theme.text
                         font.family: "JetBrainsMono Nerd Font"
                         font.pixelSize: 12
                     }
@@ -283,7 +283,7 @@ Scope {
                                     }
                                     Text {
                                         text: "✕"
-                                        color: "#88e6e1ff"
+                                        color: Theme.text
                                         font.family: "JetBrainsMono Nerd Font"
                                         font.pixelSize: 11
                                         MouseArea {
@@ -296,7 +296,7 @@ Scope {
                                 Text {
                                     width: parent.width
                                     text: modelData.summary
-                                    color: "#e6e1ff"
+                                    color: Theme.text
                                     font.family: "JetBrainsMono Nerd Font"
                                     font.pixelSize: 12
                                     font.bold: true
@@ -307,7 +307,7 @@ Scope {
                                     visible: text !== ""
                                     width: parent.width
                                     text: modelData.body
-                                    color: "#b8b3d6"
+                                    color: Theme.textMuted
                                     font.family: "JetBrainsMono Nerd Font"
                                     font.pixelSize: 11
                                     wrapMode: Text.WordWrap
@@ -335,7 +335,7 @@ Scope {
                             width: parent.width
                             Text {
                                 text: Qt.formatDateTime(clock.date, "h:mm AP")
-                                color: "#e6e1ff"
+                                color: Theme.text
                                 font.family: "JetBrainsMono Nerd Font"
                                 font.pixelSize: 18
                                 font.bold: true
@@ -363,7 +363,7 @@ Scope {
                                     width: 42
                                     horizontalAlignment: Text.AlignHCenter
                                     text: modelData
-                                    color: "#88e6e1ff"
+                                    color: Theme.text
                                     font.family: "JetBrainsMono Nerd Font"
                                     font.pixelSize: 10
                                     font.bold: true
@@ -387,7 +387,7 @@ Scope {
                                     Text {
                                         anchors.centerIn: parent
                                         text: modelData.d
-                                        color: modelData.isToday ? "#12131a" : "#e6e1ff"
+                                        color: modelData.isToday ? (Theme.lightMode ? "#ffffff" : "#12131a") : Theme.text
                                         font.family: "JetBrainsMono Nerd Font"
                                         font.pixelSize: 11
                                         font.bold: modelData.isToday

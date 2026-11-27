@@ -132,7 +132,7 @@ Scope {
                         anchors.leftMargin: 12
                         anchors.rightMargin: 12
                         verticalAlignment: TextInput.AlignVCenter
-                        color: "#e6e1ff"
+                        color: Theme.text
                         font.family: "JetBrainsMono Nerd Font"
                         font.pixelSize: 15
                         clip: true
@@ -152,7 +152,7 @@ Scope {
                             anchors.fill: parent
                             verticalAlignment: Text.AlignVCenter
                             text: "Search apps..."
-                            color: "#66e6e1ff"
+                            color: Theme.text
                             font: searchInput.font
                             visible: searchInput.text === ""
                         }
@@ -179,7 +179,7 @@ Scope {
                             anchors.left: parent.left
                             anchors.leftMargin: 10
                             text: modelData.title || ""
-                            color: modelData.title === "PINNED" ? "#c9b8ff" : "#88e6e1ff"
+                            color: modelData.title === "PINNED" ? "#c9b8ff" : Theme.text
                             font.family: "JetBrainsMono Nerd Font"
                             font.pixelSize: 11
                             font.bold: true
@@ -224,7 +224,7 @@ Scope {
                                     width: parent.width - 66
                                     anchors.verticalCenter: parent.verticalCenter
                                     text: modelData.app ? modelData.app.name : ""
-                                    color: "#e6e1ff"
+                                    color: Theme.text
                                     font.family: "JetBrainsMono Nerd Font"
                                     font.pixelSize: 14
                                     elide: Text.ElideRight
@@ -242,7 +242,7 @@ Scope {
                                         text: "\uf08d"
                                         font.family: "JetBrainsMono Nerd Font"
                                         font.pixelSize: 13
-                                        color: modelData.pinned ? "#c9b8ff" : "#44e6e1ff"
+                                        color: modelData.pinned ? "#c9b8ff" : Theme.text
                                     }
 
                                     MouseArea {

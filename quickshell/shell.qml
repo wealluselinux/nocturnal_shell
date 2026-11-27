@@ -13,4 +13,5 @@ ShellRoot {
     AiPanel {}
     SplashScreen {}
     LockScreen {}
+    CavaBar {}
 }
