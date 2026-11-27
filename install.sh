@@ -39,8 +39,9 @@ echo ""
 echo "What this installer will do:"
 echo "  1. Install dependencies (Hyprland, Quickshell, Kitty, swaybg, grim, slurp, wl-clipboard, cava, curl, python3, kdialog, notify-send)"
 echo "  2. Auto-install Hyprland, Quickshell, and nixGL via Nix if missing from your distro repos"
-echo "  3. Reset shell settings to clean Nocturnal defaults (default wall0.png wallpaper)"
-echo "  4. Install /usr/local/bin/nocturnal-session and /usr/share/wayland-sessions/nocturnal.desktop"
+echo "  3. Install JetBrainsMono Nerd Font if missing"
+echo "  4. Reset shell settings to clean Nocturnal defaults (default wall0.png wallpaper)"
+echo "  5. Install /usr/local/bin/nocturnal-session and /usr/share/wayland-sessions/nocturnal.desktop"
 echo ""
 printf "Are you ready for the installation? [y/N]: "
 read -r ans
@@ -63,16 +64,16 @@ case "$BASE" in
         ;;
     debian)
         sudo apt-get update
-        sudo apt-get install -y kitty swaybg grim slurp wl-clipboard cava curl xz-utils python3 python3-pil kdialog libnotify-bin dbus-x11
+        sudo apt-get install -y kitty swaybg grim slurp wl-clipboard cava curl xz-utils fontconfig python3 python3-pil kdialog libnotify-bin dbus-x11
         ;;
     fedora)
-        sudo dnf install -y hyprland kitty swaybg grim slurp wl-clipboard cava curl xz python3 python3-pillow kdialog libnotify dbus-x11
+        sudo dnf install -y hyprland kitty swaybg grim slurp wl-clipboard cava curl xz fontconfig python3 python3-pillow kdialog libnotify dbus-x11
         ;;
     gentoo)
         sudo emerge --ask --noreplace gui-wm/hyprland x11-terms/kitty gui-apps/swaybg gui-apps/grim gui-apps/slurp gui-apps/wl-clipboard media-sound/cava net-misc/curl dev-python/pillow kde-apps/kdialog x11-libs/libnotify
         ;;
     suse)
-        sudo zypper install -y hyprland kitty swaybg grim slurp wl-clipboard cava curl xz python3 python3-Pillow kdialog libnotify-tools dbus-1-x11
+        sudo zypper install -y hyprland kitty swaybg grim slurp wl-clipboard cava curl xz fontconfig python3 python3-Pillow kdialog libnotify-tools dbus-1-x11
         ;;
 esac
 
@@ -107,14 +108,25 @@ if ! command -v Hyprland >/dev/null 2>&1 || ! command -v quickshell >/dev/null 2
     done
 fi
 
-# 4. Reset settings to clean Nocturnal defaults
+# 4. Install JetBrainsMono Nerd Font if missing
+if ! fc-list 2>/dev/null | grep -qi "JetBrainsMono Nerd Font"; then
+    echo "Installing JetBrainsMono Nerd Font..."
+    mkdir -p "$REAL_HOME/.local/share/fonts"
+    curl -fLo /tmp/JetBrainsMono.tar.xz https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.tar.xz
+    tar -xf /tmp/JetBrainsMono.tar.xz -C "$REAL_HOME/.local/share/fonts"
+    rm -f /tmp/JetBrainsMono.tar.xz
+    chown -R "$REAL_USER:$REAL_USER" "$REAL_HOME/.local/share/fonts" 2>/dev/null || true
+    fc-cache -f
+fi
+
+# 5. Reset settings to clean Nocturnal defaults
 rm -f "$DIR/quickshell/settings.json" "$DIR/quickshell/pinned.json" "$REAL_HOME/.cache/nocturnal/clipboard.txt"
 cat > "$DIR/quickshell/settings.json" << 'JSON'
 {"lightMode":false,"accent":"#c9b8ff","themePreset":"Nocturnal","wallpaper":"wall0.png","panelOpacity":0.85,"shapeRadius":12,"blurEnabled":true,"rounding":14,"dockEnabled":true,"widgetsEnabled":true,"widgetClock":true,"widgetAnalog":true,"widgetMusic":true,"widgetSound":true,"dockAutoHide":false,"cavaEnabled":false,"use24h":false,"volumeLimit":100,"barPosition":"top","dockPosition":"middle","launcherPosition":"middle"}
 JSON
 echo "[]" > "$DIR/quickshell/pinned.json"
 
-# 5. Permissions, folders, symlink ~/nocturnal if cloned to ~/nocturnal_shell, & Session entry
+# 6. Permissions, folders, symlink ~/nocturnal if cloned to ~/nocturnal_shell, & Session entry
 chmod +x "$DIR/bin/"* 2>/dev/null || true
 mkdir -p "$REAL_HOME/Pictures/Wallpapers" "$REAL_HOME/Pictures/Screenshots"
 [ "$DIR" != "$REAL_HOME/nocturnal" ] && [ ! -e "$REAL_HOME/nocturnal" ] && ln -s "$DIR" "$REAL_HOME/nocturnal"
