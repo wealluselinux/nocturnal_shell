@@ -12,10 +12,22 @@ Scope {
 
     property string weatherTemp: "--°F"
     property string weatherCond: "Weather"
+    property var photoList: []
+    property int photoIdx: 0
+    property int quoteIdx: 0
+
+    readonly property var quotes: [
+        { q: "The night is more alive and more richly colored than the day.", a: "Vincent van Gogh" },
+        { q: "Simplicity is the ultimate sophistication.", a: "Leonardo da Vinci" },
+        { q: "Stars can't shine without darkness.", a: "D.H. Sidebottom" },
+        { q: "Talk is cheap. Show me the code.", a: "Linus Torvalds" },
+        { q: "Even the darkest night will end and the sun will rise.", a: "Victor Hugo" },
+        { q: "Make it work, make it right, make it fast.", a: "Kent Beck" }
+    ]
 
     Process {
         id: wProc
-        command: ["curl", "-s", "-m", "10", "wttr.in/?u&format=%t|%C"]
+        command: ["curl", "-s", "-m", "5", "wttr.in/?u&format=%t|%C"]
         stdout: StdioCollector {
             id: wCol
             onStreamFinished: {
@@ -28,6 +40,34 @@ Scope {
         }
     }
     Timer { interval: 900000; running: true; repeat: true; triggeredOnStart: true; onTriggered: wProc.running = true }
+
+    Process {
+        id: photoListProc
+        command: ["sh", "-c", "find \"$HOME/Pictures\" \"$HOME/nocturnal/wallpapers\" -maxdepth 2 -type f \\( -iname '*.png' -o -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.webp' \\) 2>/dev/null | sort"]
+        stdout: StdioCollector {
+            id: pCol
+            onStreamFinished: {
+                var lines = pCol.text.trim().split("\n").filter(l => l.length > 0)
+                if (lines.length > 0) root.photoList = lines
+            }
+        }
+    }
+    Component.onCompleted: photoListProc.running = true
+
+    Process {
+        id: pickPhotoProc
+        command: ["sh", "-c", "if command -v kdialog >/dev/null 2>&1; then QT_QPA_PLATFORMTHEME=kde kdialog --getopenfilename \"$HOME/Pictures\" \"Images (*.png *.jpg *.jpeg *.webp)\"; elif command -v zenity >/dev/null 2>&1; then zenity --file-selection --file-filter=\"Images | *.png *.jpg *.jpeg *.webp\"; fi"]
+        stdout: StdioCollector {
+            id: pickCol
+            onStreamFinished: {
+                var chosen = pickCol.text.trim()
+                if (chosen.length > 0) {
+                    Theme.widgetPhotoPath = chosen
+                    Theme.save()
+                }
+            }
+        }
+    }
 
     readonly property var player: {
         var list = Mpris.players.values
@@ -46,7 +86,6 @@ Scope {
         return cells
     }
 
-    // ---------- sound ----------
     PwObjectTracker { objects: [Pipewire.defaultAudioSink] }
     readonly property var sink: Pipewire.defaultAudioSink
     readonly property bool audioReady: sink !== null && sink.audio !== null
@@ -63,8 +102,6 @@ Scope {
         Pipewire.preferredDefaultAudioSink = outputs[(idx + 1) % outputs.length]
     }
 
-    // quickshell ipc -p ~/nocturnal/quickshell/shell.qml call widgets reset
-    // puts every card back in its default spot
     IpcHandler {
         target: "widgets"
         function reset(): void { WidgetStore.reset() }
@@ -104,7 +141,7 @@ Scope {
                         }
 
                         Text { text: Qt.formatDateTime(clock.date, "dddd, MMM d"); color: Theme.textMuted; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 12 }
-                        Rectangle { width: parent.width; height: 1; color: "#22ffffff" }
+                        Rectangle { width: parent.width; height: 1; color: Theme.border }
 
                         Grid {
                             width: parent.width; columns: 7; rowSpacing: 4
@@ -135,7 +172,7 @@ Scope {
 
                     Item {
                         anchors.centerIn: parent; width: 124; height: 124
-                        Rectangle { anchors.fill: parent; radius: 62; color: "transparent"; border.width: 2; border.color: "#33ffffff" }
+                        Rectangle { anchors.fill: parent; radius: 62; color: "transparent"; border.width: 2; border.color: Theme.border }
 
                         Repeater {
                             model: 12
@@ -170,7 +207,7 @@ Scope {
                         anchors.fill: parent; anchors.margins: 12; spacing: 8
 
                         Rectangle {
-                            width: 76; height: 76; radius: 10; color: "#1affffff"; clip: true
+                            width: 76; height: 76; radius: 10; color: Theme.surface; clip: true
                             anchors.horizontalCenter: parent.horizontalCenter
                             Image { anchors.fill: parent; source: root.player && root.player.trackArtUrl ? root.player.trackArtUrl : ""; fillMode: Image.PreserveAspectCrop; visible: source !== "" }
                             Text { anchors.centerIn: parent; text: "\uf001"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 22; visible: !root.player || !root.player.trackArtUrl }
@@ -201,7 +238,7 @@ Scope {
                     }
                 }
 
-                // ===== Sound (new) =====
+                // ===== Sound =====
                 DragCard {
                     visible: Theme.widgetSound; name: "sound"; width: 216; height: 130; defaultX: 408; defaultY: 56
 
@@ -229,7 +266,7 @@ Scope {
 
                             Rectangle {
                                 anchors.verticalCenter: parent.verticalCenter
-                                width: parent.width; height: 8; radius: 4; color: "#22ffffff"
+                                width: parent.width; height: 8; radius: 4; color: Theme.surface
                                 Rectangle { width: parent.width * Math.max(0, Math.min(Theme.volumeLimit / 100.0, root.vol)); height: parent.height; radius: 4; color: root.muted ? Theme.text : Theme.accent }
                             }
                             Rectangle {
@@ -247,7 +284,7 @@ Scope {
                         }
 
                         Rectangle {
-                            width: parent.width; height: 28; radius: 8; color: "#1affffff"
+                            width: parent.width; height: 28; radius: 8; color: Theme.surface
                             Text {
                                 anchors.fill: parent; anchors.leftMargin: 10; anchors.rightMargin: 10
                                 verticalAlignment: Text.AlignVCenter
@@ -255,6 +292,100 @@ Scope {
                                 color: Theme.textMuted; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11; elide: Text.ElideRight
                             }
                             MouseArea { anchors.fill: parent; onClicked: root.nextOutput() }
+                        }
+                    }
+                }
+
+                // ===== Photo =====
+                DragCard {
+                    visible: Theme.widgetPhoto; name: "photo"; width: 184; height: 184; defaultX: 408; defaultY: 196
+
+                    Item {
+                        anchors.fill: parent
+                        anchors.margins: 8
+
+                        Rectangle {
+                            anchors.fill: parent
+                            radius: 12
+                            color: Theme.surface
+                            clip: true
+
+                            readonly property string resolvedPhoto: {
+                                if (Theme.widgetPhotoPath) return Theme.widgetPhotoPath
+                                if (Theme.wallpaper) return Theme.wallpaper.indexOf("/") === 0 ? Theme.wallpaper : Quickshell.env("HOME") + "/nocturnal/wallpapers/" + Theme.wallpaper
+                                return Quickshell.env("HOME") + "/nocturnal/wallpapers/wall0.png"
+                            }
+
+                            Image {
+                                anchors.fill: parent
+                                source: "file://" + parent.resolvedPhoto
+                                fillMode: Image.PreserveAspectCrop
+                                asynchronous: true
+                            }
+
+                            Rectangle {
+                                anchors.bottom: parent.bottom
+                                anchors.right: parent.right
+                                anchors.margins: 6
+                                width: 28; height: 28; radius: 8
+                                color: Theme.panelBg
+                                border.width: 1; border.color: Theme.border
+                                Text { anchors.centerIn: parent; text: "\uf03e"; color: Theme.accent; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 12 }
+                                MouseArea {
+                                    anchors.fill: parent
+                                    acceptedButtons: Qt.LeftButton | Qt.RightButton
+                                    onClicked: (mouse) => {
+                                        if (mouse.button === Qt.RightButton) {
+                                            pickPhotoProc.running = true
+                                        } else if (root.photoList.length > 0) {
+                                            root.photoIdx = (root.photoIdx + 1) % root.photoList.length
+                                            Theme.widgetPhotoPath = root.photoList[root.photoIdx]
+                                            Theme.save()
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                // ===== Quote =====
+                DragCard {
+                    visible: Theme.widgetQuote; name: "quote"; width: 240; height: 126; defaultX: 408; defaultY: 390
+
+                    Column {
+                        anchors.fill: parent
+                        anchors.margins: 14
+                        spacing: 6
+
+                        Row {
+                            width: parent.width
+                            Text { text: "\uf10d  Daily Quote"; color: Theme.accent; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11; font.bold: true; width: parent.width - 22; anchors.verticalCenter: parent.verticalCenter }
+                            Text {
+                                text: "\uf021"; color: Theme.textMuted; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11; anchors.verticalCenter: parent.verticalCenter
+                                MouseArea { anchors.fill: parent; anchors.margins: -6; onClicked: root.quoteIdx = (root.quoteIdx + 1) % root.quotes.length }
+                            }
+                        }
+
+                        Text {
+                            width: parent.width
+                            height: 58
+                            text: "\"" + root.quotes[root.quoteIdx].q + "\""
+                            color: Theme.text
+                            font.family: "JetBrainsMono Nerd Font"
+                            font.pixelSize: 11
+                            wrapMode: Text.WordWrap
+                            elide: Text.ElideRight
+                        }
+
+                        Text {
+                            width: parent.width
+                            text: "— " + root.quotes[root.quoteIdx].a
+                            color: Theme.textMuted
+                            font.family: "JetBrainsMono Nerd Font"
+                            font.pixelSize: 10
+                            horizontalAlignment: Text.AlignRight
+                            elide: Text.ElideRight
                         }
                     }
                 }

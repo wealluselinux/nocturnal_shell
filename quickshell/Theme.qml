@@ -36,6 +36,9 @@ Singleton {
     property bool widgetAnalog: true
     property bool widgetMusic: true
     property bool widgetSound: true
+    property bool widgetPhoto: true
+    property bool widgetQuote: true
+    property string widgetPhotoPath: ""
     property bool dockAutoHide: false
     property bool cavaEnabled: false
     property bool fastfetchLogo: false
@@ -71,6 +74,9 @@ Singleton {
                 if (data.widgetAnalog !== undefined) theme.widgetAnalog = data.widgetAnalog
                 if (data.widgetMusic !== undefined) theme.widgetMusic = data.widgetMusic
                 if (data.widgetSound !== undefined) theme.widgetSound = data.widgetSound
+                if (data.widgetPhoto !== undefined) theme.widgetPhoto = data.widgetPhoto
+                if (data.widgetQuote !== undefined) theme.widgetQuote = data.widgetQuote
+                if (data.widgetPhotoPath !== undefined) theme.widgetPhotoPath = data.widgetPhotoPath
                 if (data.dockAutoHide !== undefined) theme.dockAutoHide = data.dockAutoHide
                 if (data.cavaEnabled !== undefined) theme.cavaEnabled = data.cavaEnabled
                 if (data.fastfetchLogo !== undefined) theme.fastfetchLogo = data.fastfetchLogo
@@ -129,6 +135,9 @@ Singleton {
             widgetAnalog: theme.widgetAnalog,
             widgetMusic: theme.widgetMusic,
             widgetSound: theme.widgetSound,
+            widgetPhoto: theme.widgetPhoto,
+            widgetQuote: theme.widgetQuote,
+            widgetPhotoPath: theme.widgetPhotoPath,
             dockAutoHide: theme.dockAutoHide,
             cavaEnabled: theme.cavaEnabled,
             fastfetchLogo: theme.fastfetchLogo,

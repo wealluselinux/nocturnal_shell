@@ -12,8 +12,8 @@ Scope {
     property string osPretty: "Linux"
     property string userHost: Quickshell.env("USER") || "rig"
     property string uptimeStr: "up 0m"
-    property string localVer: "1.2.5"
-    readonly property string codename: "Crescent"
+    property string localVer: "1.2.6"
+    property string codename: "Nebula"
     property string remoteVer: ""
     property string updateMsg: ""
 
@@ -68,8 +68,15 @@ Scope {
 
     Process {
         id: verProc
-        command: ["sh", "-c", "cat \"$HOME/nocturnal/VERSION\" 2>/dev/null || echo 1.2.5"]
-        stdout: StdioCollector { id: vCol; onStreamFinished: { var v = vCol.text.trim(); if (v) root.localVer = v } }
+        command: ["sh", "-c", "v=$(cat \"$HOME/nocturnal/VERSION\" 2>/dev/null || echo 1.2.6); c=$(cat \"$HOME/nocturnal/CODENAME\" 2>/dev/null || echo Nebula); echo \"$v|$c\""]
+        stdout: StdioCollector {
+            id: vCol
+            onStreamFinished: {
+                var p = vCol.text.trim().split("|")
+                if (p[0]) root.localVer = p[0]
+                if (p.length > 1 && p[1]) root.codename = p[1]
+            }
+        }
     }
 
     Process {
@@ -494,17 +501,20 @@ Scope {
                         // TAB 3: POSITION & WIDGETS
                         Column {
                             visible: root.activeTab === "position"
-                            anchors.fill: parent; spacing: 12
+                            anchors.fill: parent; spacing: 10
 
                             Text { text: "WIDGETS & DOCK"; color: Theme.accent; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11; font.bold: true }
                             Row {
-                                spacing: 8
-                                Rectangle { width: 130; height: 32; radius: 8; color: Theme.dockAutoHide ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.22) : Theme.surface; border.width: Theme.dockAutoHide ? 1 : 0; border.color: Theme.accent; Text { anchors.centerIn: parent; text: Theme.dockAutoHide ? "Dock AutoHide: ON" : "Dock AutoHide: OFF"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 } MouseArea { anchors.fill: parent; onClicked: { Theme.dockAutoHide = !Theme.dockAutoHide; Theme.save() } } }
+                                spacing: 6
                                 Repeater {
-                                    model: [{ label: "Clock", key: "widgetClock" }, { label: "Analog", key: "widgetAnalog" }, { label: "Music", key: "widgetMusic" }, { label: "Sound", key: "widgetSound" }]
-                                    Rectangle { required property var modelData; width: 72; height: 32; radius: 8; color: Theme[modelData.key] ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.22) : Theme.surface; border.width: Theme[modelData.key] ? 1 : 0; border.color: Theme.accent; Text { anchors.centerIn: parent; text: modelData.label; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 } MouseArea { anchors.fill: parent; onClicked: { Theme[modelData.key] = !Theme[modelData.key]; Theme.save() } } }
+                                    model: [{ label: "Clock", key: "widgetClock" }, { label: "Analog", key: "widgetAnalog" }, { label: "Music", key: "widgetMusic" }, { label: "Sound", key: "widgetSound" }, { label: "Photo", key: "widgetPhoto" }, { label: "Quote", key: "widgetQuote" }]
+                                    Rectangle { required property var modelData; width: 68; height: 32; radius: 8; color: Theme[modelData.key] ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.22) : Theme.surface; border.width: Theme[modelData.key] ? 1 : 0; border.color: Theme.accent; Text { anchors.centerIn: parent; text: modelData.label; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 } MouseArea { anchors.fill: parent; onClicked: { Theme[modelData.key] = !Theme[modelData.key]; Theme.save() } } }
                                 }
                                 Rectangle { width: 64; height: 32; radius: 8; color: Theme.surface; Text { anchors.centerIn: parent; text: "Reset"; color: Theme.accent; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 } MouseArea { anchors.fill: parent; onClicked: Quickshell.execDetached(["quickshell", "ipc", "-p", root.homeDir + "/nocturnal/quickshell/shell.qml", "call", "widgets", "reset"]) } }
+                            }
+                            Row {
+                                spacing: 8
+                                Rectangle { width: 144; height: 30; radius: 8; color: Theme.dockAutoHide ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.22) : Theme.surface; border.width: Theme.dockAutoHide ? 1 : 0; border.color: Theme.accent; Text { anchors.centerIn: parent; text: Theme.dockAutoHide ? "Dock AutoHide: ON" : "Dock AutoHide: OFF"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 } MouseArea { anchors.fill: parent; onClicked: { Theme.dockAutoHide = !Theme.dockAutoHide; Theme.save() } } }
                             }
 
                             Text { text: "BAR POSITION"; color: Theme.accent; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11; font.bold: true }
