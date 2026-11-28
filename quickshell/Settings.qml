@@ -7,12 +7,14 @@ Scope {
     id: root
     property bool open: false
     property string activeTab: "home"
+    property bool showModGuide: false
+    property var installedMods: []
     property var wallpapers: []
     property string homeDir: Quickshell.env("HOME") || ""
     property string osPretty: "Linux"
     property string userHost: Quickshell.env("USER") || "rig"
     property string uptimeStr: "up 0m"
-    property string localVer: "1.2.7"
+    property string localVer: "1.2.8"
     property string codename: "Nebula"
     property string remoteVer: ""
     property string updateMsg: ""
@@ -67,8 +69,44 @@ Scope {
     }
 
     Process {
+        id: modsListProc
+        command: ["python3", "-c",
+            "import json,os,glob\n" +
+            "d=os.path.expanduser('~/.config/nocturnal/mods')\n" +
+            "os.makedirs(d, exist_ok=True)\n" +
+            "out=[]\n" +
+            "for p in sorted(glob.glob(d+'/*/mod.json')):\n" +
+            "  try:\n" +
+            "    m=json.load(open(p)); mid=os.path.basename(os.path.dirname(p))\n" +
+            "    out.append({'id':mid,'name':m.get('name',mid),'author':m.get('author','unknown'),'version':m.get('version','1.0'),'description':m.get('description','')})\n" +
+            "  except Exception: pass\n" +
+            "print(json.dumps(out))"
+        ]
+        stdout: StdioCollector {
+            id: modsCol
+            onStreamFinished: {
+                try { root.installedMods = JSON.parse(modsCol.text.trim()) || [] }
+                catch (e) { root.installedMods = [] }
+            }
+        }
+    }
+
+    Process {
+        id: sampleModProc
+        command: ["python3", "-c",
+            "import json,os\n" +
+            "d=os.path.expanduser('~/.config/nocturnal/mods/hello-badge')\n" +
+            "os.makedirs(d, exist_ok=True)\n" +
+            "json.dump({'name':'Hello Badge','author':'rig','version':'1.0.0','description':'Sample floating badge mod'}, open(d+'/mod.json','w'), indent=2)\n" +
+            "qml='''import Quickshell\\nimport Quickshell.Wayland\\nimport QtQuick\\n\\nPanelWindow {\\n    exclusionMode: ExclusionMode.Ignore\\n    WlrLayershell.layer: WlrLayer.Bottom\\n    anchors { bottom: true; right: true }\\n    margins { bottom: 16; right: 16 }\\n    implicitWidth: 160; implicitHeight: 40; color: \"transparent\"\\n    Rectangle {\\n        anchors.fill: parent; radius: Theme.shapeRadius; color: Theme.panelBg; border.width: 1; border.color: Theme.accent\\n        Text { anchors.centerIn: parent; text: \"Nocturnal Mod!\"; color: Theme.text; font.family: \"JetBrainsMono Nerd Font\"; font.pixelSize: 12; font.bold: true }\\n    }\\n}\\n'''\n" +
+            "open(d+'/main.qml','w').write(qml)"
+        ]
+        onExited: modsListProc.running = true
+    }
+
+    Process {
         id: verProc
-        command: ["sh", "-c", "v=$(cat \"$HOME/nocturnal/VERSION\" 2>/dev/null || echo 1.2.7); c=$(cat \"$HOME/nocturnal/CODENAME\" 2>/dev/null || echo Nebula); echo \"$v|$c\""]
+        command: ["sh", "-c", "v=$(cat \"$HOME/nocturnal/VERSION\" 2>/dev/null || echo 1.2.8); c=$(cat \"$HOME/nocturnal/CODENAME\" 2>/dev/null || echo Nebula); echo \"$v|$c\""]
         stdout: StdioCollector {
             id: vCol
             onStreamFinished: {
@@ -137,7 +175,7 @@ Scope {
         implicitHeight: 560
         color: "transparent"
 
-        onVisibleChanged: { if (visible) { wallListProc.running = true; osProc.running = true; verProc.running = true } }
+        onVisibleChanged: { if (visible) { wallListProc.running = true; osProc.running = true; verProc.running = true; modsListProc.running = true } }
 
         Rectangle {
             id: card
@@ -174,6 +212,7 @@ Scope {
                                 { id: "themes",    icon: "\uf1fc" },
                                 { id: "wallpaper", icon: "\uf03e" },
                                 { id: "position",  icon: "\uf009" },
+                                { id: "mods",      icon: "\uf12e" },
                                 { id: "about",     icon: "\uf05a" }
                             ]
 
@@ -242,7 +281,6 @@ Scope {
                             anchors.fill: parent
                             spacing: 12
 
-                            // Wallpaper Banner Card
                             Rectangle {
                                 width: parent.width
                                 height: 150
@@ -282,7 +320,6 @@ Scope {
                                 }
                             }
 
-                            // Bottom Split: Left (Now Playing + Clock) & Right (Quick Grid)
                             Row {
                                 width: parent.width
                                 height: parent.height - 162
@@ -293,7 +330,6 @@ Scope {
                                     height: parent.height
                                     spacing: 10
 
-                                    // Now Playing card
                                     Rectangle {
                                         width: parent.width; height: 130; radius: 14; color: Theme.surface; border.width: 1; border.color: Theme.border
                                         Row {
@@ -317,7 +353,6 @@ Scope {
                                         }
                                     }
 
-                                    // Clock card
                                     Rectangle {
                                         width: parent.width; height: parent.height - 140; radius: 14; color: Theme.surface; border.width: 1; border.color: Theme.border
                                         Row {
@@ -332,7 +367,6 @@ Scope {
                                     }
                                 }
 
-                                // Right 2x4 Quick Toggles
                                 Grid {
                                     width: parent.width * 0.52 - 12
                                     height: parent.height
@@ -537,7 +571,163 @@ Scope {
                             }
                         }
 
-                        // TAB 4: ABOUT & UPDATES
+                        // TAB 4: MODS
+                        Column {
+                            visible: root.activeTab === "mods"
+                            anchors.fill: parent
+                            spacing: 10
+
+                            Row {
+                                width: parent.width
+                                spacing: 8
+                                Rectangle {
+                                    width: 116; height: 30; radius: 8; color: Theme.surface; border.width: 1; border.color: Theme.border
+                                    Text { anchors.centerIn: parent; text: "Open Folder"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 }
+                                    MouseArea { anchors.fill: parent; onClicked: Quickshell.execDetached(["sh", "-c", "mkdir -p \"$HOME/.config/nocturnal/mods\" && dolphin \"$HOME/.config/nocturnal/mods\""]) }
+                                }
+                                Rectangle {
+                                    width: 122; height: 30; radius: 8; color: Theme.surface; border.width: 1; border.color: Theme.border
+                                    Text { anchors.centerIn: parent; text: "+ Sample Mod"; color: Theme.accent; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11; font.bold: true }
+                                    MouseArea { anchors.fill: parent; onClicked: sampleModProc.running = true }
+                                }
+                                Rectangle {
+                                    width: 84; height: 30; radius: 8; color: Theme.surface; border.width: 1; border.color: Theme.border
+                                    Text { anchors.centerIn: parent; text: "Refresh"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 }
+                                    MouseArea { anchors.fill: parent; onClicked: modsListProc.running = true }
+                                }
+                                Rectangle {
+                                    width: 146; height: 30; radius: 8
+                                    color: root.showModGuide ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.25) : Theme.surface
+                                    border.width: 1; border.color: Theme.accent
+                                    Text { anchors.centerIn: parent; text: root.showModGuide ? "Back to Mods" : "How to Make"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11; font.bold: true }
+                                    MouseArea { anchors.fill: parent; onClicked: root.showModGuide = !root.showModGuide }
+                                }
+                            }
+
+                            // Installed Mods List
+                            Item {
+                                visible: !root.showModGuide
+                                width: parent.width
+                                height: parent.height - 42
+
+                                Text {
+                                    anchors.centerIn: parent
+                                    visible: root.installedMods.length === 0
+                                    horizontalAlignment: Text.AlignHCenter
+                                    text: "No mods installed in ~/.config/nocturnal/mods\nClick '+ Sample Mod' to try one or 'How to Make' to build your own!"
+                                    color: Theme.textMuted
+                                    font.family: "JetBrainsMono Nerd Font"
+                                    font.pixelSize: 12
+                                    lineHeight: 1.5
+                                }
+
+                                ListView {
+                                    anchors.fill: parent
+                                    clip: true
+                                    spacing: 8
+                                    model: root.installedMods
+                                    delegate: Rectangle {
+                                        required property var modelData
+                                        readonly property bool enabled: Theme.isModEnabled(modelData.id)
+                                        width: ListView.view.width
+                                        height: 64
+                                        radius: 10
+                                        color: Theme.surface
+                                        border.width: 1
+                                        border.color: enabled ? Theme.accent : Theme.border
+
+                                        Row {
+                                            anchors.fill: parent
+                                            anchors.margins: 12
+                                            spacing: 12
+
+                                            Column {
+                                                width: parent.width - 110
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                spacing: 3
+                                                Text { text: modelData.name + "  v" + modelData.version + "  ·  by " + modelData.author; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 12; font.bold: true; elide: Text.ElideRight; width: parent.width }
+                                                Text { text: modelData.description || ("Folder: ~/.config/nocturnal/mods/" + modelData.id); color: Theme.textMuted; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11; elide: Text.ElideRight; width: parent.width }
+                                            }
+
+                                            Rectangle {
+                                                width: 90; height: 32; radius: 8
+                                                anchors.verticalCenter: parent.verticalCenter
+                                                color: enabled ? Theme.accent : Theme.panelBg
+                                                border.width: 1; border.color: Theme.accent
+                                                Text {
+                                                    anchors.centerIn: parent
+                                                    text: enabled ? "Enabled" : "Enable"
+                                                    color: enabled ? (Theme.lightMode ? "#ffffff" : "#12131a") : Theme.text
+                                                    font.family: "JetBrainsMono Nerd Font"
+                                                    font.pixelSize: 11
+                                                    font.bold: true
+                                                }
+                                                MouseArea { anchors.fill: parent; onClicked: Theme.toggleMod(modelData.id) }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                            // How to Make a Mod Guide
+                            Rectangle {
+                                visible: root.showModGuide
+                                width: parent.width
+                                height: parent.height - 42
+                                radius: 12
+                                color: Theme.surface
+                                border.width: 1
+                                border.color: Theme.border
+
+                                Flickable {
+                                    anchors.fill: parent
+                                    anchors.margins: 14
+                                    contentHeight: guideText.implicitHeight
+                                    clip: true
+
+                                    Text {
+                                        id: guideText
+                                        width: parent.width
+                                        color: Theme.text
+                                        font.family: "JetBrainsMono Nerd Font"
+                                        font.pixelSize: 11
+                                        wrapMode: Text.WordWrap
+                                        lineHeight: 1.45
+                                        text: "HOW TO MAKE A NOCTURNAL MOD\n\n" +
+                                              "1. Create a folder in:\n" +
+                                              "   ~/.config/nocturnal/mods/my-mod/\n" +
+                                              "   (Kept outside ~/nocturnal so updates never erase your mods!)\n\n" +
+                                              "2. Add mod.json inside that folder:\n" +
+                                              "   {\n" +
+                                              "     \"name\": \"My Mod\",\n" +
+                                              "     \"author\": \"yourname\",\n" +
+                                              "     \"version\": \"1.0.0\",\n" +
+                                              "     \"description\": \"What your mod does\"\n" +
+                                              "   }\n\n" +
+                                              "3. Add main.qml inside that folder:\n" +
+                                              "   import Quickshell\n" +
+                                              "   import Quickshell.Wayland\n" +
+                                              "   import QtQuick\n\n" +
+                                              "   PanelWindow {\n" +
+                                              "     exclusionMode: ExclusionMode.Ignore\n" +
+                                              "     WlrLayershell.layer: WlrLayer.Bottom\n" +
+                                              "     anchors { bottom: true; right: true }\n" +
+                                              "     implicitWidth: 160; implicitHeight: 40\n" +
+                                              "     color: \"transparent\"\n" +
+                                              "     Rectangle {\n" +
+                                              "       anchors.fill: parent; radius: Theme.shapeRadius\n" +
+                                              "       color: Theme.panelBg; border.color: Theme.accent; border.width: 1\n" +
+                                              "       Text { anchors.centerIn: parent; text: \"Hi!\"; color: Theme.text }\n" +
+                                              "     }\n" +
+                                              "   }\n\n" +
+                                              "4. Click 'Refresh' and toggle your mod ON!\n" +
+                                              "   Full guide: ~/nocturnal/MODS.md"
+                                    }
+                                }
+                            }
+                        }
+
+                        // TAB 5: ABOUT & UPDATES
                         Column {
                             visible: root.activeTab === "about"
                             anchors.fill: parent; spacing: 12

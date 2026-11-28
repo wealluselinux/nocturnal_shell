@@ -48,6 +48,7 @@ Singleton {
     property string dockPosition: "middle"
     property string launcherPosition: "middle"
     property var rightPillOrder: ["wifi", "stats", "battery", "volume"]
+    property var enabledMods: []
     property var pinnedIds: []
 
     FileView {
@@ -86,6 +87,7 @@ Singleton {
                 if (data.dockPosition) theme.dockPosition = data.dockPosition
                 if (data.launcherPosition) theme.launcherPosition = data.launcherPosition
                 if (Array.isArray(data.rightPillOrder)) theme.rightPillOrder = data.rightPillOrder
+                if (Array.isArray(data.enabledMods)) theme.enabledMods = data.enabledMods
             } catch (e) {}
         }
     }
@@ -146,9 +148,23 @@ Singleton {
             barPosition: theme.barPosition,
             dockPosition: theme.dockPosition,
             launcherPosition: theme.launcherPosition,
-            rightPillOrder: theme.rightPillOrder
+            rightPillOrder: theme.rightPillOrder,
+            enabledMods: theme.enabledMods
         }))
         syncApps()
+    }
+
+    function isModEnabled(modId) {
+        return theme.enabledMods.indexOf(modId) >= 0
+    }
+
+    function toggleMod(modId) {
+        var next = theme.enabledMods.slice()
+        var idx = next.indexOf(modId)
+        if (idx >= 0) next.splice(idx, 1)
+        else next.push(modId)
+        theme.enabledMods = next
+        save()
     }
 
     function moveRightPill(idx, delta) {

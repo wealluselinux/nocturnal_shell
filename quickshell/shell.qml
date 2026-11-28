@@ -16,4 +16,5 @@ ShellRoot {
     CavaBar {}
     Updater {}
     WeatherEffects {}
+    ModLoader {}
 }
