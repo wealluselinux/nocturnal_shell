@@ -12,7 +12,7 @@ Scope {
     property string osPretty: "Linux"
     property string userHost: Quickshell.env("USER") || "rig"
     property string uptimeStr: "up 0m"
-    property string localVer: "1.2.6"
+    property string localVer: "1.2.7"
     property string codename: "Nebula"
     property string remoteVer: ""
     property string updateMsg: ""
@@ -68,7 +68,7 @@ Scope {
 
     Process {
         id: verProc
-        command: ["sh", "-c", "v=$(cat \"$HOME/nocturnal/VERSION\" 2>/dev/null || echo 1.2.6); c=$(cat \"$HOME/nocturnal/CODENAME\" 2>/dev/null || echo Nebula); echo \"$v|$c\""]
+        command: ["sh", "-c", "v=$(cat \"$HOME/nocturnal/VERSION\" 2>/dev/null || echo 1.2.7); c=$(cat \"$HOME/nocturnal/CODENAME\" 2>/dev/null || echo Nebula); echo \"$v|$c\""]
         stdout: StdioCollector {
             id: vCol
             onStreamFinished: {
@@ -515,6 +515,7 @@ Scope {
                             Row {
                                 spacing: 8
                                 Rectangle { width: 144; height: 30; radius: 8; color: Theme.dockAutoHide ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.22) : Theme.surface; border.width: Theme.dockAutoHide ? 1 : 0; border.color: Theme.accent; Text { anchors.centerIn: parent; text: Theme.dockAutoHide ? "Dock AutoHide: ON" : "Dock AutoHide: OFF"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 } MouseArea { anchors.fill: parent; onClicked: { Theme.dockAutoHide = !Theme.dockAutoHide; Theme.save() } } }
+                                Rectangle { width: 116; height: 30; radius: 8; color: Theme.cavaEnabled ? Qt.rgba(Theme.accent.r, Theme.accent.g, Theme.accent.b, 0.22) : Theme.surface; border.width: Theme.cavaEnabled ? 1 : 0; border.color: Theme.accent; Text { anchors.centerIn: parent; text: Theme.cavaEnabled ? "Cava: ON" : "Cava: OFF"; color: Theme.text; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11 } MouseArea { anchors.fill: parent; onClicked: { Theme.cavaEnabled = !Theme.cavaEnabled; Theme.save() } } }
                             }
 
                             Text { text: "BAR POSITION"; color: Theme.accent; font.family: "JetBrainsMono Nerd Font"; font.pixelSize: 11; font.bold: true }
