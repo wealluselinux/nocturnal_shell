@@ -12,14 +12,16 @@ cfg_path = os.path.join(cfg_dir, "ai.json")
 os.makedirs(cfg_dir, exist_ok=True)
 
 SYSTEM_PROMPT = (
-    "You are Nocturnal AI, a helpful desktop assistant running inside Nocturnal Shell on Gentoo Linux (Hyprland + Quickshell). "
+    "You are Nocturnal AI (and Capri when asked), a helpful desktop assistant running inside Nocturnal Shell on Gentoo Linux (Hyprland + Quickshell). "
     "You can open apps, run shell commands, and control the desktop when the user asks.\n"
+    "IMPORTANT: Do NOT use JSON tool/function calls. Reply in plain text.\n"
     "To open an app, include on its own line: [ACTION:OPEN_APP]<command>[/ACTION] (e.g. firefox-bin, kitty, dolphin, code, spotify).\n"
-    "To run a shell command and show its output, include on its own line: [ACTION:RUN_CMD]<command>[/ACTION].\n"
+    "To run a shell command and show its output (for example closing a window with hyprctl or listing files), include on its own line: [ACTION:RUN_CMD]<command>[/ACTION].\n"
     "You can also control Nocturnal Shell via quickshell ipc, e.g.:\n"
     "- Open settings: quickshell ipc -p ~/nocturnal/quickshell/shell.qml call settings toggle\n"
     "- Lock screen: quickshell ipc -p ~/nocturnal/quickshell/shell.qml call lockscreen lock\n"
     "- Take screenshot: ~/nocturnal/bin/screenshot\n"
+    "- Close a window (e.g. kitty): pkill -x kitty\n"
     "Never run destructive commands (like rm -rf /, mkfs, dd, or shutdown without explicit request). Keep responses concise."
 )
 
@@ -80,6 +82,18 @@ def run_actions(text):
     return cleaned
 
 
+def groq_chat(key, model, msgs):
+    body = json.dumps({"model": model, "messages": msgs}).encode()
+    req = urllib.request.Request(
+        "https://api.groq.com/openai/v1/chat/completions",
+        data=body,
+        headers={"Content-Type": "application/json", "User-Agent": "Nocturnal-AI/1.0", "Authorization": f"Bearer {key}"},
+    )
+    with urllib.request.urlopen(req, timeout=30) as resp:
+        data = json.loads(resp.read().decode())
+    return data["choices"][0]["message"]["content"].strip()
+
+
 if len(sys.argv) >= 2 and sys.argv[1] == "--set-key":
     cfg = load_cfg()
     prov = sys.argv[2]
@@ -127,19 +141,20 @@ try:
             avail = [
                 m["id"]
                 for m in json.loads(m_resp.read().decode()).get("data", [])
-                if not any(x in m["id"].lower() for x in ("whisper", "tts", "guard", "prompt-guard", "safeguard"))
+                if not any(x in m["id"].lower() for x in ("whisper", "tts", "guard", "prompt-guard", "safeguard", "gpt-oss"))
             ]
-        model = next((m for m in avail if "llama" in m.lower()), avail[0] if avail else "llama-3.1-8b-instant")
+        preferred = ("llama-3.3-70b-versatile", "llama-3.1-8b-instant")
+        model = next((p for p in preferred if p in avail), next((m for m in avail if "llama" in m.lower()), avail[0] if avail else "llama-3.1-8b-instant"))
         msgs = [{"role": "system", "content": SYSTEM_PROMPT}] + [{"role": m["role"], "content": m["text"]} for m in messages]
-        body = json.dumps({"model": model, "messages": msgs}).encode()
-        req = urllib.request.Request(
-            "https://api.groq.com/openai/v1/chat/completions",
-            data=body,
-            headers={"Content-Type": "application/json", "User-Agent": "Nocturnal-AI/1.0", "Authorization": f"Bearer {key}"},
-        )
-        with urllib.request.urlopen(req, timeout=30) as resp:
-            data = json.loads(resp.read().decode())
-        reply = data["choices"][0]["message"]["content"].strip()
+        try:
+            reply = groq_chat(key, model, msgs)
+        except urllib.error.HTTPError as e:
+            err_body = e.read().decode("utf-8", "replace")
+            if e.code == 400 and "tool_use_failed" in err_body and model != "llama-3.1-8b-instant":
+                reply = groq_chat(key, "llama-3.1-8b-instant", msgs)
+            else:
+                print(f"API error {e.code}: {err_body[:200]}")
+                sys.exit(0)
 
     elif prov == "gemini":
         key = cfg.get("gemini_key", "").strip()
